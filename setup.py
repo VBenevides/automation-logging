@@ -10,7 +10,7 @@ from setuptools import setup
 extras_require = {
     "selenium": ["selenium"],
     "pyautogui": ["pyautogui", "pyscreeze", "pillow"],
-    "all": ["selenium", "pyautogui"],  # Option to install all optional dependencies
+    "all": ["selenium", "pyautogui", "pyscreeze", "pillow"],
 }
 
 with open("README.md", "r", encoding="utf-8") as file:
