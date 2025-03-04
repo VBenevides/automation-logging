@@ -28,3 +28,4 @@ MoveDocs:
 	@if [ -d "$(HTMLDIR)" ]; then \
 		mv "$(HTMLDIR)"/* "$(DOCSDIR)"/; \
 	fi
+	@touch "$(DOCSDIR)"/.nojekyll
