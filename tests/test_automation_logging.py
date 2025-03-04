@@ -8,9 +8,6 @@ import logging
 from random import randrange
 
 import automation_logging as alog
-import selenium.common
-import selenium.webdriver
-
 
 def delete_dir(log_dir):
     if os.path.exists(log_dir):

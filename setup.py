@@ -13,6 +13,9 @@ extras_require = {
     "all": ["selenium", "pyautogui"],  # Option to install all optional dependencies
 }
 
+with open("README.md", "r", encoding="utf-8") as file:
+    long_description = file.read()
+
 setup(
     name="automation-logging",
     version="1.0.0",
@@ -22,5 +25,7 @@ setup(
     author="Vinicius Benevides",
     author_email="massaki1999@gmail.com",
     description="Logging for automation, offering thread-safety, log cleanup and screenshot support.",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     extras_require=extras_require,
 )
