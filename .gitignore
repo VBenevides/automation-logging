@@ -4,5 +4,4 @@
 __pycache__
 dist
 build
-!/docs/build
 *egg*
