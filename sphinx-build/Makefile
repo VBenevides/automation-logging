@@ -6,7 +6,9 @@
 SPHINXOPTS    ?=
 SPHINXBUILD   ?= sphinx-build
 SOURCEDIR     = source
-BUILDDIR      = ../docs
+BUILDDIR      = build
+HTMLDIR		  = $(BUILDDIR)/html
+DOCSDIR		  = ../docs
 
 # Put it first so that "make" without argument is like "make help".
 help:
@@ -18,3 +20,11 @@ help:
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
 %: Makefile
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+	@$(MAKE) MoveDocs
+
+MoveDocs:
+	@rm -rf "$(DOCSDIR)"
+	@mkdir -p "$(DOCSDIR)"
+	@if [ -d "$(HTMLDIR)" ]; then \
+		mv "$(HTMLDIR)"/* "$(DOCSDIR)"/; \
+	fi
