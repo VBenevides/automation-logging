@@ -9,7 +9,7 @@ Automation Logging
 
 __version__ = "1.0.2"
 
-from typing import Optional
+from typing import Optional, Any
 import logging
 import os
 import shutil
@@ -147,7 +147,7 @@ class AutomationLogger:
             When set, it will be possible to use the module's logging functions without using set_global_log
 
         level_threshold: LogLevel
-            Lowest log level that will be logged, any level less severe than the current one will be ignored.
+            Lowest log level that will be logged, Any level less severe than the current one will be ignored.
             The order from least severe to most severe: debug, info, state, warning, error, exception, critical
 
         Returns
@@ -188,9 +188,7 @@ class AutomationLogger:
 
         self.log_dir = log_dir
         self.log_name = log_name
-        self.log_file = None
         self.threshold = level_threshold
-        self._logger = None
         # Include private mutex to make this class thread-safe
         self._mutex = threading.Lock()
 
@@ -324,13 +322,13 @@ class AutomationLogger:
         os.makedirs(log_dir, exist_ok=True)
         return log_dir
 
-    def _write(self, message: any, level: LogLevel) -> None:
+    def _write(self, message: Any, level: LogLevel) -> None:
         """Writes the message to the log file with the given level
         If the level is lower than the threshold, the message is not written
 
         Parameters
         ----------
-        message: any
+        message: Any
             Message to be logged
 
         Returns
@@ -359,12 +357,12 @@ class AutomationLogger:
             else:
                 print(f"Unknown log level: {level}")
 
-    def debug(self, message: any) -> None:
+    def debug(self, message: Any) -> None:
         """Writes the message to the log file with level DEBUG
 
         Parameters
         ----------
-        message : any
+        message : Any
             Message to be logged
 
         Returns
@@ -379,13 +377,13 @@ class AutomationLogger:
 
         self._write(message, LogLevel.DEBUG)
 
-    def info(self, message: any) -> None:
+    def info(self, message: Any) -> None:
         """
         Writes the message to the log file with level INFO.
 
         Parameters
         ----------
-        message : any
+        message : Any
             Message to be logged
 
         Returns
@@ -400,13 +398,13 @@ class AutomationLogger:
 
         self._write(message, LogLevel.INFO)
 
-    def warning(self, message: any) -> None:
+    def warning(self, message: Any) -> None:
         """
         Writes the message to the log file with level WARNING.
 
         Parameters
         ----------
-        message : any
+        message : Any
             Message to be logged
 
         Returns
@@ -421,7 +419,7 @@ class AutomationLogger:
 
         self._write(message, LogLevel.WARNING)
 
-    def error(self, message: any) -> None:
+    def error(self, message: Any) -> None:
         """
         Writes the message to the log file with level ERROR.
 
@@ -430,7 +428,7 @@ class AutomationLogger:
 
         Parameters
         ----------
-        message : any
+        message : Any
             Message to be logged
 
         Returns
@@ -448,13 +446,13 @@ class AutomationLogger:
 
         self._write(message, LogLevel.ERROR)
 
-    def critical(self, message: any) -> None:
+    def critical(self, message: Any) -> None:
         """
         Writes the message to the log file with level CRITICAL.
 
         Parameters
         ----------
-        message : any
+        message : Any
             Message to be logged
 
         Returns
@@ -472,7 +470,7 @@ class AutomationLogger:
 
         self._write(message, LogLevel.CRITICAL)
 
-    def exception(self, message: any) -> None:
+    def exception(self, message: Any) -> None:
         """
         Writes an exception to the log file with level ERROR.
 
@@ -481,7 +479,7 @@ class AutomationLogger:
 
         Parameters
         ----------
-        message : any
+        message : Any
             Message to be logged
 
         Returns
@@ -499,7 +497,7 @@ class AutomationLogger:
 
         self._write(message, LogLevel.EXCEPTION)
 
-    def stat(self, info_dict: any) -> None:
+    def stat(self, info_dict: Any) -> None:
         """
         Writes a dictionary to the log file with level STAT.
 
@@ -508,7 +506,7 @@ class AutomationLogger:
 
         Parameters
         ----------
-        info_dict : any
+        info_dict : Any
             Message to be logged
 
         Returns
@@ -579,7 +577,7 @@ class AutomationLogger:
 
         return filename
 
-    def capture_screenshot_selenium(self, driver: any, filename: Optional[str] = None) -> str:
+    def capture_screenshot_selenium(self, driver: Any, filename: Optional[str] = None) -> str:
         """
         Captures a screenshot of a Selenium driver instance.
 
@@ -811,12 +809,12 @@ def set_global_log(logger):
     global_log = logger
 
 
-def debug(message: any) -> None:
+def debug(message: Any) -> None:
     """Writes the message to the log file with level DEBUG
 
     Parameters
     ----------
-    message : any
+    message : Any
         Message to be logged
 
     Returns
@@ -838,7 +836,7 @@ def debug(message: any) -> None:
     global_log.debug(message)
 
 
-def debug_else(message: any) -> None:
+def debug_else(message: Any) -> None:
     """Calls debug if global_log is set, else calls print"""
     if global_log is not None:
         debug(message)
@@ -846,12 +844,12 @@ def debug_else(message: any) -> None:
         print(f"{'DEBUG':<10} | {message}")
 
 
-def info(message: any) -> None:
+def info(message: Any) -> None:
     """Writes the message to the log file with level INFO
 
     Parameters
     ----------
-    message : any
+    message : Any
         Message to be logged
 
     Returns
@@ -873,7 +871,7 @@ def info(message: any) -> None:
     global_log.info(message)
 
 
-def info_else(message: any) -> None:
+def info_else(message: Any) -> None:
     """Calls info if global_log is set, else calls print"""
     if global_log is not None:
         info(message)
@@ -881,12 +879,12 @@ def info_else(message: any) -> None:
         print(f"{'INFO':<10} | {message}")
 
 
-def stat(message: any) -> None:
+def stat(message: Any) -> None:
     """Writes the message to the log file with level STAT
 
     Parameters
     ----------
-    message : any
+    message : Any
         Message to be logged
 
     Returns
@@ -909,7 +907,7 @@ def stat(message: any) -> None:
     global_log.stat(message)
 
 
-def stat_else(message: any) -> None:
+def stat_else(message: Any) -> None:
     """Calls stat if global_log is set, else calls print"""
     if global_log is not None:
         stat(message)
@@ -917,12 +915,12 @@ def stat_else(message: any) -> None:
         print(f"{'STAT':<10} | {message}")
 
 
-def warning(message: any) -> None:
+def warning(message: Any) -> None:
     """Writes the message to the log file with level WARNING
 
     Parameters
     ----------
-    message : any
+    message : Any
         Message to be logged
 
     Returns
@@ -944,7 +942,7 @@ def warning(message: any) -> None:
     global_log.warning(message)
 
 
-def warning_else(message: any) -> None:
+def warning_else(message: Any) -> None:
     """Calls warning if global_log is set, else calls print"""
     if global_log is not None:
         debug(message)
@@ -952,12 +950,12 @@ def warning_else(message: any) -> None:
         print(f"{'WARNING':<10} | {message}")
 
 
-def error(message: any) -> None:
+def error(message: Any) -> None:
     """Writes the message to the log file with level ERROR
 
     Parameters
     ----------
-    message : any
+    message : Any
         Message to be logged
 
     Returns
@@ -979,7 +977,7 @@ def error(message: any) -> None:
     global_log.error(message)
 
 
-def error_else(message: any) -> None:
+def error_else(message: Any) -> None:
     """Calls error if global_log is set, else calls print"""
     if global_log is not None:
         error(message)
@@ -987,12 +985,12 @@ def error_else(message: any) -> None:
         print(f"{'ERROR':<10} | {message}")
 
 
-def exception(message: any) -> None:
+def exception(message: Any) -> None:
     """Writes the message to the log file with level EXCEPTION
 
     Parameters
     ----------
-    message : any
+    message : Any
         Message to be logged
 
     Returns
@@ -1017,7 +1015,7 @@ def exception(message: any) -> None:
     global_log.exception(message)
 
 
-def exception_else(message: any) -> None:
+def exception_else(message: Any) -> None:
     """Calls exception if global_log is set, else calls print"""
     if global_log is not None:
         exception(message)
@@ -1025,12 +1023,12 @@ def exception_else(message: any) -> None:
         print(f"{'EXCEPTION':<10} | {message}")
 
 
-def critical(message: any) -> None:
+def critical(message: Any) -> None:
     """Writes the message to the log file with level CRITICAL
 
     Parameters
     ----------
-    message : any
+    message : Any
         Message to be logged
 
     Returns
@@ -1055,7 +1053,7 @@ def critical(message: any) -> None:
     global_log.critical(message)
 
 
-def critical_else(message: any) -> None:
+def critical_else(message: Any) -> None:
     """Calls critical if global_log is set, else calls print"""
     if global_log is not None:
         critical(message)
@@ -1103,7 +1101,7 @@ def capture_screenshot(filename: Optional[str] = None):
     return global_log.capture_screenshot(filename)
 
 
-def capture_screenshot_selenium(driver: any, filename: Optional[str] = None) -> str:
+def capture_screenshot_selenium(driver: Any, filename: Optional[str] = None) -> str:
     """
     Captures a screenshot of a Selenium driver instance.
 
