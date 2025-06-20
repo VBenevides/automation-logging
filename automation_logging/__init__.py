@@ -7,7 +7,7 @@ Automation Logging
 * **Integrated Screenshot Capture:** Captures informative screenshots directly within your logs, supporting full-screen captures (using `pyautogui`) and Selenium WebDriver screenshots, including headless browser support (using `selenium`).
 """
 
-__version__ = "1.0.0"
+__version__ = "1.0.2"
 
 from typing import Optional
 import logging
@@ -21,19 +21,29 @@ import threading
 from enum import IntEnum
 from datetime import datetime, timedelta
 
-try:
-    from selenium.webdriver.chrome.webdriver import WebDriver
+truthy_values = ["1", "true", "t", "yes", "y", "on"]
+OPT_DISABLE_WEB = os.environ.get("alog_disable_web", "0").lower() in truthy_values
+OPT_DISABLE_IMAGE = os.environ.get("alog_disable_image", "0").lower() in truthy_values
 
-    SELENIUM_INSTALLED = True
-except ImportError:
+if OPT_DISABLE_WEB:
     SELENIUM_INSTALLED = False
+else:
+    try:
+        from selenium.webdriver.chrome.webdriver import WebDriver
 
-try:
-    from pyautogui import screenshot
+        SELENIUM_INSTALLED = True
+    except ImportError:
+        SELENIUM_INSTALLED = False
 
-    PYAUTOGUI_INSTALLED = True
-except ImportError:
+if OPT_DISABLE_IMAGE:
     PYAUTOGUI_INSTALLED = False
+else:
+    try:
+        from pyautogui import screenshot
+
+        PYAUTOGUI_INSTALLED = True
+    except ImportError:
+        PYAUTOGUI_INSTALLED = False
 
 
 class LogLevel(IntEnum):
@@ -176,7 +186,8 @@ class AutomationLogger:
         script_name_no_ext = os.path.splitext(script_name)[0]
         log_name = f"{script_name_no_ext}.log"
 
-        self.log_dir = None
+        self.log_dir = log_dir
+        self.log_name = log_name
         self.log_file = None
         self.threshold = level_threshold
         self._logger = None
@@ -678,21 +689,21 @@ class AutomationLogger:
                 prefixes = [str(prefix)]
             else:
                 sep = str(sep)
-                files = [x for x in os.listdir(self._log_dir) if sep in x and x != self._log_name]
+                files = [x for x in os.listdir(self.log_dir) if sep in x and x != self.log_name]
                 prefixes = set(x.split(sep)[0] for x in files)
 
             for prefix in prefixes:
                 prefix = prefix.strip()
                 files = [
                     x
-                    for x in os.listdir(self._log_dir)
-                    if x.startswith(prefix) and x != self._log_name
+                    for x in os.listdir(self.log_dir)
+                    if x.startswith(prefix) and x != self.log_name
                 ]
-                os.makedirs(os.path.join(self._log_dir, prefix), exist_ok=True)
+                os.makedirs(os.path.join(self.log_dir, prefix), exist_ok=True)
                 for file in files:
                     shutil.move(
-                        os.path.join(self._log_dir, file),
-                        os.path.join(self._log_dir, prefix),
+                        os.path.join(self.log_dir, file),
+                        os.path.join(self.log_dir, prefix),
                     )
                 self.info(f"Grouped files by prefix: {prefix}")
 
