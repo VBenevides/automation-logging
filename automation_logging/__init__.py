@@ -649,11 +649,11 @@ class AutomationLogger:
         Parameters
         ----------
         prefix: str, optional
-            Prefix of files that will be grouped inside the folder `prefix` in the log directory
+            To ensure expected behaviour, the prefix in the file name must be followed by one of the following: [" ", "-", "_", "@"]
 
         sep: str, optional
             Separator used to split file names and automatically determine file prefixes.
-            Files with the same prefix will be grouped inside the same folder in the log directory
+            To ensure expected behaviour, the string before the separator must be followed by one of the following: [" ", "-", "_", "@", sep]
 
         Returns
         -------
@@ -690,20 +690,36 @@ class AutomationLogger:
                 files = [x for x in os.listdir(self.log_dir) if sep in x and x != self.log_name]
                 prefixes = set(x.split(sep)[0] for x in files)
 
+            # There was a bug when a prefix is a substring of another, such as prefix1 and prefix10
+            # An attempt to avoid it is to see if the prefix is separate from the rest of the text
+            # by common separators
+            separators = [" ", "_", "-", "@"]
+            if sep is not None:
+                separators.append(sep)
+
             for prefix in prefixes:
                 prefix = prefix.strip()
-                files = [
-                    x
-                    for x in os.listdir(self.log_dir)
-                    if x.startswith(prefix) and x != self.log_name
-                ]
+                files = []
+                for file in os.listdir(self.log_dir):
+                    if file == self.log_name or not os.path.isfile(
+                        os.path.join(self.log_dir, file)
+                    ):
+                        continue
+                    if prefix[-1] in separators:
+                        files.append(prefix[-1])
+                    else:
+                        for sep in separators:
+                            if file.startswith(prefix + sep):
+                                files.append(file)
+                                break
+
                 os.makedirs(os.path.join(self.log_dir, prefix), exist_ok=True)
                 for file in files:
                     shutil.move(
                         os.path.join(self.log_dir, file),
                         os.path.join(self.log_dir, prefix),
                     )
-                self.info(f"Grouped files by prefix: {prefix}")
+                self._logger.info(f"Grouped files by prefix: {prefix}")
 
 
 def add_logging_level(levelName, levelNum, methodName=None):
