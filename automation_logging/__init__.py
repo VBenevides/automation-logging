@@ -101,6 +101,7 @@ class AutomationLogger:
         script_path: str,
         log_dir: Optional[str] = None,
         log_to_console: bool = True,
+        log_to_file: bool = True,
         max_logs: int = 60,
         max_days: int = 30,
         encoding: str = "utf-8",
@@ -126,6 +127,9 @@ class AutomationLogger:
 
         log_to_console : bool, optional
             If True, log messages will also appear on the console.
+
+        log_to_file : bool, optional
+            If True, creates a log file and writes to it
 
         max_logs : int, optional
             Number of log files to retain in the log directory.
@@ -180,6 +184,8 @@ class AutomationLogger:
             raise ValueError("max_days parameter must be a positive integer")
         if not isinstance(level_threshold, LogLevel):
             raise ValueError("level_threshold must be a LogLevel")
+        if log_to_console is False and log_to_file is False:
+            raise ValueError("log_to_console and log_to_file cannot be both False")
 
         log_dir = log_dir or os.path.join(os.path.dirname(script_path), "Logs")
         script_name = os.path.basename(script_path)
@@ -195,12 +201,15 @@ class AutomationLogger:
         try:
 
             # Delete older files and create current directory
-            self.log_dir = self._clear_log_dir(
-                log_dir=log_dir,
-                max_logs=max_logs,
-                max_days=max_days,
-            )
-            self.log_file = os.path.join(self.log_dir, log_name)
+            if log_to_file:
+                self.log_dir = self._clear_log_dir(
+                    log_dir=log_dir,
+                    max_logs=max_logs,
+                    max_days=max_days,
+                )
+                self.log_file = os.path.join(self.log_dir, log_name)
+            else:
+                self.log_file = ""
 
             # Getting system and user information to include in the log
             system_name = platform.node()
@@ -225,10 +234,11 @@ class AutomationLogger:
             formatter = logging.Formatter(_log_format, datefmt="%Y-%m-%d %H:%M:%S%z")
 
             # log to file
-            file_handler = logging.FileHandler(self.log_file, encoding=encoding)
-            file_handler.setLevel(level_threshold.to_logging_level())
-            file_handler.setFormatter(formatter)
-            self._logger.addHandler(file_handler)
+            if log_to_file:
+                file_handler = logging.FileHandler(self.log_file, encoding=encoding)
+                file_handler.setLevel(level_threshold.to_logging_level())
+                file_handler.setFormatter(formatter)
+                self._logger.addHandler(file_handler)
 
             # print in console
             if log_to_console:
