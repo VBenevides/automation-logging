@@ -69,6 +69,12 @@
 <li class="toctree-l3"><a class="reference internal" href="#automation_logging.LogLevel.to_logging_level"><code class="docutils literal notranslate"><span class="pre">LogLevel.to_logging_level()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#automation_logging.ScreenshotManager"><code class="docutils literal notranslate"><span class="pre">ScreenshotManager</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#automation_logging.ScreenshotManager.capture_screenshot"><code class="docutils literal notranslate"><span class="pre">ScreenshotManager.capture_screenshot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#automation_logging.ScreenshotManager.capture_screenshot_selenium"><code class="docutils literal notranslate"><span class="pre">ScreenshotManager.capture_screenshot_selenium()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#automation_logging.ScreenshotManager.group_by_prefix"><code class="docutils literal notranslate"><span class="pre">ScreenshotManager.group_by_prefix()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#automation_logging.add_logging_level"><code class="docutils literal notranslate"><span class="pre">add_logging_level()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#automation_logging.capture_screenshot"><code class="docutils literal notranslate"><span class="pre">capture_screenshot()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#automation_logging.capture_screenshot_selenium"><code class="docutils literal notranslate"><span class="pre">capture_screenshot_selenium()</span></code></a></li>
@@ -80,6 +86,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#automation_logging.error_else"><code class="docutils literal notranslate"><span class="pre">error_else()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#automation_logging.exception"><code class="docutils literal notranslate"><span class="pre">exception()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#automation_logging.exception_else"><code class="docutils literal notranslate"><span class="pre">exception_else()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#automation_logging.get_global_log"><code class="docutils literal notranslate"><span class="pre">get_global_log()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#automation_logging.group_by_prefix"><code class="docutils literal notranslate"><span class="pre">group_by_prefix()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#automation_logging.info"><code class="docutils literal notranslate"><span class="pre">info()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#automation_logging.info_else"><code class="docutils literal notranslate"><span class="pre">info_else()</span></code></a></li>
@@ -121,19 +128,18 @@
 <section id="id1">
 <h2>Automation Logging<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p><strong>Thread-Safe Logging:</strong> Ensures reliable and consistent logging from multi-threaded applications, preventing message corruption.</p></li>
-<li><p><strong>Automated Log Management:</strong> Simplifies log file maintenance with configurable retention policies based on age or file count.</p></li>
-<li><p><strong>Seamless Integration:</strong> Enables effortless integration with existing projects by allowing the library to override the standard <cite>logging</cite> module’s root logger.</p></li>
-<li><p><strong>Integrated Screenshot Capture:</strong> Captures informative screenshots directly within your logs, supporting full-screen captures (using <cite>pyautogui</cite>) and Selenium WebDriver screenshots, including headless browser support (using <cite>selenium</cite>).</p></li>
+<li><p>Thread-Safe Logging: Ensures reliable and consistent logging from multi-threaded applications, preventing message corruption.</p></li>
+<li><p>Automated Log Management: Simplifies log file maintenance with configurable retention policies based on age or file count.</p></li>
+<li><p>Seamless Integration: Enables effortless integration with existing projects by allowing the library to override the standard <cite>logging</cite> module’s root logger.</p></li>
+<li><p>Integrated Screenshot Capture: Captures informative screenshots directly within your logs, supporting full-screen captures (using <cite>pyautogui</cite>) and Selenium WebDriver screenshots, including headless browser support (using <cite>selenium</cite>).</p></li>
 </ul>
 </section>
 <dl class="py class">
 <dt class="sig sig-object py" id="automation_logging.AutomationLogger">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">AutomationLogger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">script_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_to_console</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_logs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'utf-8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_logging_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_global_log</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#automation_logging.LogLevel" title="automation_logging.LogLevel"><span class="pre">LogLevel</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">LogLevel.INFO</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation_logging.html#AutomationLogger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.AutomationLogger" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">AutomationLogger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">script_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_to_console</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_to_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_logs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'utf-8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_logging_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_global_log</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#automation_logging.LogLevel" title="automation_logging.core.LogLevel"><span class="pre">LogLevel</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">LogLevel.INFO</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation_logging/core.html#AutomationLogger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.AutomationLogger" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>from .automation_logging import *</p>
-<blockquote>
-<div><p>Class used to log the program execution to a file</p>
+<p>Class used to log the program execution to a file</p>
+<p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">log_dir</span> <span class="o">=</span> <span class="s2">&quot;./tests/Logs&quot;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">AutomationLogger</span><span class="p">(</span><span class="n">script_path</span><span class="o">=</span><span class="vm">__file__</span><span class="p">,</span> <span class="n">log_dir</span><span class="o">=</span><span class="n">log_dir</span><span class="p">,</span> <span class="n">log_to_console</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt;</span>
@@ -147,50 +153,15 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;End of program&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-</div></blockquote>
 <dl class="py method">
 <dt class="sig sig-object py" id="automation_logging.AutomationLogger.capture_screenshot">
-<span class="sig-name descname"><span class="pre">capture_screenshot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/automation_logging.html#AutomationLogger.capture_screenshot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.AutomationLogger.capture_screenshot" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">capture_screenshot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimize_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/automation_logging/core.html#AutomationLogger.capture_screenshot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.AutomationLogger.capture_screenshot" title="Link to this definition"></a></dt>
 <dd><p>Captures a screenshot of the entire screen and saves it in the log directory.</p>
-<p>The name of the screenshot is written with level INFO in the log file with the format:
-log_timestamp_screenshot.png or the filename parameter.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Name of the screenshot. The file extension will be .png. If a file with the same
-name already exists, the new file will be named with a suffix (x), where x is
-the number of existing files with the same name. Example: image.png, image (1).png,
-image(2).png, image(3).png.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>filename</strong> – The name of the file saved</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>ValueError</strong> – If the <cite>filename</cite> passed is not a string</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">AutomationLogger</span><span class="p">(</span><span class="n">script_path</span><span class="o">=</span><span class="vm">__file__</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">capture_screenshot</span><span class="p">(</span><span class="s2">&quot;example_screenshot.png&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="automation_logging.AutomationLogger.capture_screenshot_selenium">
-<span class="sig-name descname"><span class="pre">capture_screenshot_selenium</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/automation_logging.html#AutomationLogger.capture_screenshot_selenium"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.AutomationLogger.capture_screenshot_selenium" title="Link to this definition"></a></dt>
-<dd><p>Captures a screenshot of a Selenium driver instance.</p>
-<p>The name of the screenshot is written with level INFO in the log file with the format:
-log_timestamp_screenshot_selenium.png or the filename parameter.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>driver</strong> (<em>WebDriver</em>) – Selenium WebDriver instance from which to capture the screenshot.</p></li>
-<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Name of the screenshot. If a file with the same name already exists, the new file
-will be named with a suffix (x), where x is the number of existing files with the
-same name. Example: image.png, image (1).png, image(2).png, image(3).png.</p></li>
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Name of the screenshot.</p></li>
+<li><p><strong>optimize_size</strong> (<em>bool</em>) – Flag to save the image using a memory efficient and lossless format (.webp)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -200,24 +171,41 @@ same name. Example: image.png, image (1).png, image(2).png, image(3).png.</p></l
 <dd class="field-odd"><p>str</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>ValueError</strong> – If the <cite>filename</cite> passed is not a string</p>
+<dd class="field-even"><p><strong>ValueError</strong> – If screenshot manager is not available (log_to_file=False)</p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">AutomationLogger</span><span class="p">(</span><span class="n">script_path</span><span class="o">=</span><span class="vm">__file__</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">driver</span> <span class="o">=</span> <span class="n">selenium</span><span class="o">.</span><span class="n">webdriver</span><span class="o">.</span><span class="n">Chrome</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">capture_screenshot_selenium</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="s2">&quot;chromedriver_screenshot.png&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="automation_logging.AutomationLogger.capture_screenshot_selenium">
+<span class="sig-name descname"><span class="pre">capture_screenshot_selenium</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/automation_logging/core.html#AutomationLogger.capture_screenshot_selenium"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.AutomationLogger.capture_screenshot_selenium" title="Link to this definition"></a></dt>
+<dd><p>Captures a screenshot of a Selenium driver instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>driver</strong> (<em>WebDriver</em>) – Selenium WebDriver instance from which to capture the screenshot.</p></li>
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Name of the screenshot.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>filename</strong> – The name of the file saved</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If screenshot manager is not available (log_to_file=False)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automation_logging.AutomationLogger.critical">
-<span class="sig-name descname"><span class="pre">critical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging.html#AutomationLogger.critical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.AutomationLogger.critical" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">critical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging/core.html#AutomationLogger.critical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.AutomationLogger.critical" title="Link to this definition"></a></dt>
 <dd><p>Writes the message to the log file with level CRITICAL.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>message</strong> (<em>any</em>) – Message to be logged</p>
+<dd class="field-odd"><p><strong>message</strong> (<em>str</em>) – Message to be logged</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
@@ -235,11 +223,11 @@ same name. Example: image.png, image (1).png, image(2).png, image(3).png.</p></l
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automation_logging.AutomationLogger.debug">
-<span class="sig-name descname"><span class="pre">debug</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging.html#AutomationLogger.debug"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.AutomationLogger.debug" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">debug</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging/core.html#AutomationLogger.debug"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.AutomationLogger.debug" title="Link to this definition"></a></dt>
 <dd><p>Writes the message to the log file with level DEBUG</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>message</strong> (<em>any</em>) – Message to be logged</p>
+<dd class="field-odd"><p><strong>message</strong> (<em>str</em>) – Message to be logged</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
@@ -254,13 +242,13 @@ same name. Example: image.png, image (1).png, image(2).png, image(3).png.</p></l
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automation_logging.AutomationLogger.error">
-<span class="sig-name descname"><span class="pre">error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging.html#AutomationLogger.error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.AutomationLogger.error" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging/core.html#AutomationLogger.error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.AutomationLogger.error" title="Link to this definition"></a></dt>
 <dd><p>Writes the message to the log file with level ERROR.</p>
 <p>The difference between log.error and log.exception is that log.exception also prints
 the stack traceback of the exception.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>message</strong> (<em>any</em>) – Message to be logged</p>
+<dd class="field-odd"><p><strong>message</strong> (<em>str</em>) – Message to be logged</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
@@ -278,13 +266,13 @@ the stack traceback of the exception.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automation_logging.AutomationLogger.exception">
-<span class="sig-name descname"><span class="pre">exception</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging.html#AutomationLogger.exception"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.AutomationLogger.exception" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">exception</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging/core.html#AutomationLogger.exception"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.AutomationLogger.exception" title="Link to this definition"></a></dt>
 <dd><p>Writes an exception to the log file with level ERROR.</p>
 <p>The difference between log.error and log.exception is that log.exception also prints
 the stack traceback of the exception.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>message</strong> (<em>any</em>) – Message to be logged</p>
+<dd class="field-odd"><p><strong>message</strong> (<em>str</em>) – Message to be logged</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
@@ -302,51 +290,28 @@ the stack traceback of the exception.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automation_logging.AutomationLogger.group_by_prefix">
-<span class="sig-name descname"><span class="pre">group_by_prefix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation_logging.html#AutomationLogger.group_by_prefix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.AutomationLogger.group_by_prefix" title="Link to this definition"></a></dt>
-<dd><p>Group files in the log directory by prefix.
-If <cite>prefix</cite> is given all files that don’t have the prefix will be ignored.
-If <cite>sep</cite> is given all files will be grouped according to automatic prefixes defined by the
-text before the separator.
-<cite>prefix</cite> takes priority over <cite>sep</cite> if both are set</p>
-<p>This function is useful to group images captured during the execution</p>
+<span class="sig-name descname"><span class="pre">group_by_prefix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation_logging/core.html#AutomationLogger.group_by_prefix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.AutomationLogger.group_by_prefix" title="Link to this definition"></a></dt>
+<dd><p>Group files in the log directory by prefix.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>prefix</strong> (<em>str</em><em>, </em><em>optional</em>) – Prefix of files that will be grouped inside the folder <cite>prefix</cite> in the log directory</p></li>
-<li><p><strong>sep</strong> (<em>str</em><em>, </em><em>optional</em>) – Separator used to split file names and automatically determine file prefixes.
-Files with the same prefix will be grouped inside the same folder in the log directory</p></li>
+<li><p><strong>prefix</strong> (<em>str</em><em>, </em><em>optional</em>) – Prefix of files that will be grouped</p></li>
+<li><p><strong>sep</strong> (<em>str</em><em>, </em><em>optional</em>) – Separator used to split file names and automatically determine file prefixes.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ValueError</strong> – If the <cite>prefix</cite> and <cite>sep</cite> are None</p>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If screenshot manager is not available (log_to_file=False)</p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">AutomationLogger</span><span class="p">(</span><span class="n">script_path</span><span class="o">=</span><span class="vm">__file__</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Manual prefix</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">capture_screenshot</span><span class="p">(</span><span class="s2">&quot;ABC - Image 1&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">capture_screenshot</span><span class="p">(</span><span class="s2">&quot;ABC - Image 2&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">capture_screenshot</span><span class="p">(</span><span class="s2">&quot;ABC - Image 3&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">group_by_prefix</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;ABC&quot;</span><span class="p">)</span> <span class="c1"># creates folder &quot;ABC&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Automatic Prefix</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">capture_screenshot</span><span class="p">(</span><span class="s2">&quot;ABC - Image 1&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">capture_screenshot</span><span class="p">(</span><span class="s2">&quot;ABC - Image 2&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">capture_screenshot</span><span class="p">(</span><span class="s2">&quot;ABCD - Image 1&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">group_by_prefix</span><span class="p">(</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot;-&quot;</span><span class="p">)</span> <span class="c1"># creates folders &quot;ABC&quot; and &quot;ABCD&quot;</span>
-</pre></div>
-</div>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automation_logging.AutomationLogger.info">
-<span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging.html#AutomationLogger.info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.AutomationLogger.info" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging/core.html#AutomationLogger.info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.AutomationLogger.info" title="Link to this definition"></a></dt>
 <dd><p>Writes the message to the log file with level INFO.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>message</strong> (<em>any</em>) – Message to be logged</p>
+<dd class="field-odd"><p><strong>message</strong> (<em>str</em>) – Message to be logged</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
@@ -361,13 +326,13 @@ Files with the same prefix will be grouped inside the same folder in the log dir
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automation_logging.AutomationLogger.stat">
-<span class="sig-name descname"><span class="pre">stat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">info_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging.html#AutomationLogger.stat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.AutomationLogger.stat" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">stat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging/core.html#AutomationLogger.stat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.AutomationLogger.stat" title="Link to this definition"></a></dt>
 <dd><p>Writes a dictionary to the log file with level STAT.</p>
 <p>This method should be used to aggregate or summarize information in a single message
 to facilitate the use of analytics solutions like elastic and opensearch.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>info_dict</strong> (<em>any</em>) – Message to be logged</p>
+<dd class="field-odd"><p><strong>message</strong> (<em>str</em><em> | </em><em>dict</em><em>[</em><em>Any</em><em>, </em><em>Any</em><em>]</em>) – Message to be logged</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
@@ -383,11 +348,11 @@ to facilitate the use of analytics solutions like elastic and opensearch.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automation_logging.AutomationLogger.warning">
-<span class="sig-name descname"><span class="pre">warning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging.html#AutomationLogger.warning"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.AutomationLogger.warning" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">warning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging/core.html#AutomationLogger.warning"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.AutomationLogger.warning" title="Link to this definition"></a></dt>
 <dd><p>Writes the message to the log file with level WARNING.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>message</strong> (<em>any</em>) – Message to be logged</p>
+<dd class="field-odd"><p><strong>message</strong> (<em>str</em>) – Message to be logged</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
@@ -404,7 +369,7 @@ to facilitate the use of analytics solutions like elastic and opensearch.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="automation_logging.LogLevel">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">LogLevel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation_logging.html#LogLevel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.LogLevel" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">LogLevel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation_logging/core.html#LogLevel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.LogLevel" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">IntEnum</span></code></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="automation_logging.LogLevel.CRITICAL">
@@ -443,15 +408,136 @@ to facilitate the use of analytics solutions like elastic and opensearch.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="automation_logging.LogLevel.to_logging_level">
-<span class="sig-name descname"><span class="pre">to_logging_level</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation_logging.html#LogLevel.to_logging_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.LogLevel.to_logging_level" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">to_logging_level</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation_logging/core.html#LogLevel.to_logging_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.LogLevel.to_logging_level" title="Link to this definition"></a></dt>
 <dd><p>Returns the corresponding logging level from the logging module.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="automation_logging.ScreenshotManager">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">ScreenshotManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation_logging/screenshots.html#ScreenshotManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.ScreenshotManager" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Manages screenshot capture functionality for automation logging.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="automation_logging.ScreenshotManager.capture_screenshot">
+<span class="sig-name descname"><span class="pre">capture_screenshot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimize_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/automation_logging/screenshots.html#ScreenshotManager.capture_screenshot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.ScreenshotManager.capture_screenshot" title="Link to this definition"></a></dt>
+<dd><p>Captures a screenshot of the entire screen and saves it in the log directory.</p>
+<p>The name of the screenshot is written with level INFO in the log file with the format:
+screenshot_log_timestamp.png (default) or the filename parameter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – <p>Name of the screenshot. If no extension is found in filename, it will be .png if <cite>optimize_size</cite> = False.
+If <cite>optimize_size</cite> is True, the extension will be .webp whether the extension is found or not.</p>
+<p>If a file with the same name already exists, the new file will be named with a suffix (x), where x is
+the number of existing files with the same name. Example: image.png, image (1).png,
+image(2).png, image(3).png.</p>
+</p></li>
+<li><p><strong>optimize_size</strong> (<em>bool</em>) – Flag to save the image using a memory efficient and lossless format (.webp)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>filename</strong> – The name of the file saved</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>NotImplementedError</strong> – If pyautogui and pillow/PIL are not installed</p></li>
+<li><p><strong>ValueError</strong> – If the <cite>filename</cite> passed is not a string</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">AutomationLogger</span><span class="p">(</span><span class="n">script_path</span><span class="o">=</span><span class="vm">__file__</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">capture_screenshot</span><span class="p">(</span><span class="s2">&quot;example_screenshot.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="automation_logging.ScreenshotManager.capture_screenshot_selenium">
+<span class="sig-name descname"><span class="pre">capture_screenshot_selenium</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/automation_logging/screenshots.html#ScreenshotManager.capture_screenshot_selenium"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.ScreenshotManager.capture_screenshot_selenium" title="Link to this definition"></a></dt>
+<dd><p>Captures a screenshot of a Selenium driver instance.</p>
+<p>The name of the screenshot is written with level INFO in the log file with the format:
+selenium_screenshot_log_timestamp.png or the filename parameter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>driver</strong> (<em>WebDriver</em>) – Selenium WebDriver instance from which to capture the screenshot.</p></li>
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Name of the screenshot. If a file with the same name already exists, the new file
+will be named with a suffix (x), where x is the number of existing files with the
+same name. Example: image.png, image (1).png, image(2).png, image(3).png.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>filename</strong> – The name of the file saved</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>NotImplementedError</strong> – If selenium is not installed</p></li>
+<li><p><strong>ValueError</strong> – If the <cite>filename</cite> passed is not a string</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">AutomationLogger</span><span class="p">(</span><span class="n">script_path</span><span class="o">=</span><span class="vm">__file__</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">driver</span> <span class="o">=</span> <span class="n">selenium</span><span class="o">.</span><span class="n">webdriver</span><span class="o">.</span><span class="n">Chrome</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">capture_screenshot_selenium</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="s2">&quot;chromedriver_screenshot.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="automation_logging.ScreenshotManager.group_by_prefix">
+<span class="sig-name descname"><span class="pre">group_by_prefix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation_logging/screenshots.html#ScreenshotManager.group_by_prefix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.ScreenshotManager.group_by_prefix" title="Link to this definition"></a></dt>
+<dd><p>Group files in the log directory by prefix.
+If <cite>prefix</cite> is given all files that don’t have the prefix will be ignored.
+If <cite>sep</cite> is given all files will be grouped according to automatic prefixes defined by the
+text before the separator.
+<cite>prefix</cite> takes priority over <cite>sep</cite> if both are set</p>
+<p>This function is useful to group images captured during the execution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prefix</strong> (<em>str</em><em>, </em><em>optional</em>) – To ensure expected behaviour, the prefix in the file name must be followed by one of the following: [” “, “-”, “_”, “&#64;”]</p></li>
+<li><p><strong>sep</strong> (<em>str</em><em>, </em><em>optional</em>) – Separator used to split file names and automatically determine file prefixes.
+To ensure expected behaviour, the string before the separator must be followed by one of the following: [” “, “-”, “_”, “&#64;”, sep]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If the <cite>prefix</cite> and <cite>sep</cite> are None</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">AutomationLogger</span><span class="p">(</span><span class="n">script_path</span><span class="o">=</span><span class="vm">__file__</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Manual prefix</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">capture_screenshot</span><span class="p">(</span><span class="s2">&quot;ABC - Image 1&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">capture_screenshot</span><span class="p">(</span><span class="s2">&quot;ABC - Image 2&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">capture_screenshot</span><span class="p">(</span><span class="s2">&quot;ABC - Image 3&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">group_by_prefix</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;ABC&quot;</span><span class="p">)</span> <span class="c1"># creates folder &quot;ABC&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Automatic Prefix</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">capture_screenshot</span><span class="p">(</span><span class="s2">&quot;ABC - Image 1&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">capture_screenshot</span><span class="p">(</span><span class="s2">&quot;ABC - Image 2&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">capture_screenshot</span><span class="p">(</span><span class="s2">&quot;ABCD - Image 1&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">group_by_prefix</span><span class="p">(</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot;-&quot;</span><span class="p">)</span> <span class="c1"># creates folders &quot;ABC&quot; and &quot;ABCD&quot;</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="automation_logging.add_logging_level">
-<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">add_logging_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">levelName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">levelNum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation_logging.html#add_logging_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.add_logging_level" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">add_logging_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">levelName</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">levelNum</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging/utils.html#add_logging_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.add_logging_level" title="Link to this definition"></a></dt>
 <dd><p>Comprehensively adds a new logging level to the <cite>logging</cite> module and the
 currently configured logging class.</p>
 <p><cite>levelName</cite> becomes an attribute of the <cite>logging</cite> module with the value
@@ -490,22 +576,30 @@ instead of throwing an exception, allowing re-initialization of the log.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="automation_logging.capture_screenshot">
-<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">capture_screenshot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation_logging.html#capture_screenshot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.capture_screenshot" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">capture_screenshot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimize_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/automation_logging/global_logger.html#capture_screenshot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.capture_screenshot" title="Link to this definition"></a></dt>
 <dd><p>Captures a screenshot of the entire screen and saves it in the log directory.</p>
 <p>The name of the screenshot is written with level INFO in the log file with the format:
-log_timestamp_screenshot.png or the filename parameter.</p>
+screenshot_log_timestamp.png (default) or the filename parameter.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Name of the screenshot. The file extension will be .png. If a file with the same
-name already exists, the new file will be named with a suffix (x), where x is
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – <p>Name of the screenshot. If no extension is found in filename, it will be .png if <cite>optimize_size</cite> = False.
+If <cite>optimize_size</cite> is True, the extension will be .webp whether the extesion is found or not.</p>
+<p>If a file with the same name already exists, the new file will be named with a suffix (x), where x is
 the number of existing files with the same name. Example: image.png, image (1).png,
 image(2).png, image(3).png.</p>
+</p></li>
+<li><p><strong>optimize_size</strong> (<em>bool</em>) – Flag to save the image using a memory efficient and lossless format (.webp)</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>filename</strong> – The name of the file saved</p>
 </dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ValueError</strong> – If the <cite>filename</cite> passed is not a string</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If global log is not set</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -521,7 +615,7 @@ image(2).png, image(3).png.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="automation_logging.capture_screenshot_selenium">
-<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">capture_screenshot_selenium</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/automation_logging.html#capture_screenshot_selenium"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.capture_screenshot_selenium" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">capture_screenshot_selenium</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">driver</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/automation_logging/global_logger.html#capture_screenshot_selenium"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.capture_screenshot_selenium" title="Link to this definition"></a></dt>
 <dd><p>Captures a screenshot of a Selenium driver instance.</p>
 <p>The name of the screenshot is written with level INFO in the log file with the format:
 log_timestamp_screenshot_selenium.png or the filename parameter.</p>
@@ -534,11 +628,14 @@ will be named with a suffix (x), where x is the number of existing files with th
 same name. Example: image.png, image (1).png, image(2).png, image(3).png.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>filename</strong> – The name of the file saved</p>
 </dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ValueError</strong> – If the <cite>filename</cite> passed is not a string</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If global log is not set</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -555,14 +652,17 @@ same name. Example: image.png, image (1).png, image(2).png, image(3).png.</p></l
 
 <dl class="py function">
 <dt class="sig sig-object py" id="automation_logging.critical">
-<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">critical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging.html#critical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.critical" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">critical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging/global_logger.html#critical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.critical" title="Link to this definition"></a></dt>
 <dd><p>Writes the message to the log file with level CRITICAL</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>message</strong> (<em>any</em>) – Message to be logged</p>
+<dd class="field-odd"><p><strong>message</strong> (<em>str</em>) – Message to be logged</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If global log is not set</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -580,20 +680,23 @@ same name. Example: image.png, image (1).png, image(2).png, image(3).png.</p></l
 
 <dl class="py function">
 <dt class="sig sig-object py" id="automation_logging.critical_else">
-<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">critical_else</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging.html#critical_else"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.critical_else" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">critical_else</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging/global_logger.html#critical_else"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.critical_else" title="Link to this definition"></a></dt>
 <dd><p>Calls critical if global_log is set, else calls print</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="automation_logging.debug">
-<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">debug</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging.html#debug"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.debug" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">debug</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging/global_logger.html#debug"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.debug" title="Link to this definition"></a></dt>
 <dd><p>Writes the message to the log file with level DEBUG</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>message</strong> (<em>any</em>) – Message to be logged</p>
+<dd class="field-odd"><p><strong>message</strong> (<em>str</em>) – Message to be logged</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If global log is not set</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -608,20 +711,23 @@ same name. Example: image.png, image (1).png, image(2).png, image(3).png.</p></l
 
 <dl class="py function">
 <dt class="sig sig-object py" id="automation_logging.debug_else">
-<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">debug_else</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging.html#debug_else"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.debug_else" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">debug_else</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging/global_logger.html#debug_else"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.debug_else" title="Link to this definition"></a></dt>
 <dd><p>Calls debug if global_log is set, else calls print</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="automation_logging.error">
-<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging.html#error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.error" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging/global_logger.html#error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.error" title="Link to this definition"></a></dt>
 <dd><p>Writes the message to the log file with level ERROR</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>message</strong> (<em>any</em>) – Message to be logged</p>
+<dd class="field-odd"><p><strong>message</strong> (<em>str</em>) – Message to be logged</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If global log is not set</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -636,20 +742,23 @@ same name. Example: image.png, image (1).png, image(2).png, image(3).png.</p></l
 
 <dl class="py function">
 <dt class="sig sig-object py" id="automation_logging.error_else">
-<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">error_else</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging.html#error_else"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.error_else" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">error_else</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging/global_logger.html#error_else"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.error_else" title="Link to this definition"></a></dt>
 <dd><p>Calls error if global_log is set, else calls print</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="automation_logging.exception">
-<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">exception</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging.html#exception"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.exception" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">exception</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging/global_logger.html#exception"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.exception" title="Link to this definition"></a></dt>
 <dd><p>Writes the message to the log file with level EXCEPTION</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>message</strong> (<em>any</em>) – Message to be logged</p>
+<dd class="field-odd"><p><strong>message</strong> (<em>str</em>) – Message to be logged</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If global log is not set</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -667,13 +776,19 @@ same name. Example: image.png, image (1).png, image(2).png, image(3).png.</p></l
 
 <dl class="py function">
 <dt class="sig sig-object py" id="automation_logging.exception_else">
-<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">exception_else</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging.html#exception_else"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.exception_else" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">exception_else</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging/global_logger.html#exception_else"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.exception_else" title="Link to this definition"></a></dt>
 <dd><p>Calls exception if global_log is set, else calls print</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="automation_logging.get_global_log">
+<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">get_global_log</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">SupportsAutomationLogger</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging/global_logger.html#get_global_log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.get_global_log" title="Link to this definition"></a></dt>
+<dd><p>Returns the value of the global_log variable</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="automation_logging.group_by_prefix">
-<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">group_by_prefix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging.html#group_by_prefix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.group_by_prefix" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">group_by_prefix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging/global_logger.html#group_by_prefix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.group_by_prefix" title="Link to this definition"></a></dt>
 <dd><p>Group files in the log directory by prefix.
 If <cite>prefix</cite> is given all files that don’t have the prefix will be ignored.
 If <cite>sep</cite> is given all files will be grouped according to automatic prefixes defined by the
@@ -692,7 +807,7 @@ Files with the same prefix will be grouped inside the same folder in the log dir
 <dd class="field-even"><p>None</p>
 </dd>
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ValueError</strong> – If the <cite>prefix</cite> and <cite>sep</cite> are None</p>
+<dd class="field-odd"><p><strong>ValueError</strong> – If global log is not set</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -717,14 +832,17 @@ Files with the same prefix will be grouped inside the same folder in the log dir
 
 <dl class="py function">
 <dt class="sig sig-object py" id="automation_logging.info">
-<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging.html#info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.info" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging/global_logger.html#info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.info" title="Link to this definition"></a></dt>
 <dd><p>Writes the message to the log file with level INFO</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>message</strong> (<em>any</em>) – Message to be logged</p>
+<dd class="field-odd"><p><strong>message</strong> (<em>str</em>) – Message to be logged</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If global log is not set</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -739,13 +857,13 @@ Files with the same prefix will be grouped inside the same folder in the log dir
 
 <dl class="py function">
 <dt class="sig sig-object py" id="automation_logging.info_else">
-<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">info_else</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging.html#info_else"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.info_else" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">info_else</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging/global_logger.html#info_else"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.info_else" title="Link to this definition"></a></dt>
 <dd><p>Calls info if global_log is set, else calls print</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="automation_logging.set_global_log">
-<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">set_global_log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/automation_logging.html#set_global_log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.set_global_log" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">set_global_log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsAutomationLogger</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging/global_logger.html#set_global_log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.set_global_log" title="Link to this definition"></a></dt>
 <dd><p>Set the global log object of the <cite>automation_logging</cite> module</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -768,14 +886,17 @@ Files with the same prefix will be grouped inside the same folder in the log dir
 
 <dl class="py function">
 <dt class="sig sig-object py" id="automation_logging.stat">
-<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">stat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging.html#stat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.stat" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">stat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging/global_logger.html#stat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.stat" title="Link to this definition"></a></dt>
 <dd><p>Writes the message to the log file with level STAT</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>message</strong> (<em>any</em>) – Message to be logged</p>
+<dd class="field-odd"><p><strong>message</strong> (<em>str</em><em> | </em><em>dict</em><em>[</em><em>Any</em><em>, </em><em>Any</em><em>]</em>) – Message to be logged</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If global log is not set</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -791,20 +912,23 @@ Files with the same prefix will be grouped inside the same folder in the log dir
 
 <dl class="py function">
 <dt class="sig sig-object py" id="automation_logging.stat_else">
-<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">stat_else</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging.html#stat_else"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.stat_else" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">stat_else</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging/global_logger.html#stat_else"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.stat_else" title="Link to this definition"></a></dt>
 <dd><p>Calls stat if global_log is set, else calls print</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="automation_logging.warning">
-<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">warning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging.html#warning"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.warning" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">warning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging/global_logger.html#warning"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.warning" title="Link to this definition"></a></dt>
 <dd><p>Writes the message to the log file with level WARNING</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>message</strong> (<em>any</em>) – Message to be logged</p>
+<dd class="field-odd"><p><strong>message</strong> (<em>str</em>) – Message to be logged</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If global log is not set</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -819,7 +943,7 @@ Files with the same prefix will be grouped inside the same folder in the log dir
 
 <dl class="py function">
 <dt class="sig sig-object py" id="automation_logging.warning_else">
-<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">warning_else</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging.html#warning_else"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.warning_else" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">automation_logging.</span></span><span class="sig-name descname"><span class="pre">warning_else</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/automation_logging/global_logger.html#warning_else"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#automation_logging.warning_else" title="Link to this definition"></a></dt>
 <dd><p>Calls warning if global_log is set, else calls print</p>
 </dd></dl>
 
