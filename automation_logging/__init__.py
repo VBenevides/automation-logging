@@ -9,9 +9,9 @@ Automation Logging
 
 # pyright: reportUnnecessaryIsInstance=false, reportUnreachable=false, reportUnknownMemberType=false, reportMissingModuleSource=false, reportMissingImports=false, reportAny=false, reportExplicitAny=false
 
-__version__ = "1.0.3"
+__version__ = "1.1.0"
 
-from _thread import lock
+from threading import Lock
 from logging import Logger
 from typing import Any
 from importlib.util import find_spec
@@ -22,7 +22,6 @@ import sys
 import getpass
 import traceback
 import platform
-import threading
 from enum import IntEnum
 from datetime import datetime, timedelta
 
@@ -31,19 +30,20 @@ OPT_DISABLE_WEB = os.environ.get("alog_disable_web", "0").lower() in truthy_valu
 OPT_DISABLE_IMAGE = os.environ.get("alog_disable_image", "0").lower() in truthy_values
 
 if OPT_DISABLE_WEB:
-    web_enabled = False
+    selenium_enabled = False
 else:
     if find_spec("selenium") is not None:
-        web_enabled = True
+        selenium_enabled = True
     else:
-        web_enabled = False
+        selenium_enabled = False
 
 if OPT_DISABLE_IMAGE:
     image_enabled = False
 else:
-    if find_spec("pyautogui") is not None:
+    if find_spec("pyautogui") is not None and find_spec("PIL") is not None:
         image_enabled = True
         from pyautogui import screenshot
+        from PIL.Image import Image
     else:
         image_enabled = False
 
@@ -198,7 +198,7 @@ class AutomationLogger:
         self.log_name: str = log_name
         self.threshold: LogLevel = level_threshold
         # Include private mutex to make this class thread-safe
-        self._mutex: lock = threading.Lock()
+        self._mutex: Lock = Lock()
 
         try:
             # Delete older files and create current directory
@@ -537,20 +537,28 @@ class AutomationLogger:
 
         self._write(str(message), LogLevel.STAT)
 
-    def capture_screenshot(self, filename: str | None = None) -> str:
+    def capture_screenshot(
+        self, filename: str | None = None, optimize_size: bool = False
+    ) -> str:
         """
         Captures a screenshot of the entire screen and saves it in the log directory.
 
         The name of the screenshot is written with level INFO in the log file with the format:
-        log_timestamp_screenshot.png or the filename parameter.
+        screenshot_log_timestamp.png (default) or the filename parameter.
 
         Parameters
         ----------
         filename : str, optional
-            Name of the screenshot. The file extension will be .png. If a file with the same
-            name already exists, the new file will be named with a suffix (x), where x is
+            Name of the screenshot. If no extension is found in filename, it will be .png if `optimize_size` = False.
+            If `optimize_size` is True, the extension will be .webp whether the extesion is found or not.
+
+            If a file with the same name already exists, the new file will be named with a suffix (x), where x is
             the number of existing files with the same name. Example: image.png, image (1).png,
             image(2).png, image(3).png.
+
+
+        optimize_size : bool
+            Flag to save the image using a memory efficient and lossless format (.webp)
 
         Returns
         -------
@@ -576,20 +584,30 @@ class AutomationLogger:
         if filename is not None and not isinstance(filename, str):
             raise ValueError("filename must be a string")
 
-        timestamp = datetime.now().strftime(r"%Y_%m_%d-%H_%M_%S")
         if filename is None:
+            timestamp = datetime.now().strftime(r"%Y_%m_%d-%H_%M_%S")
             basename = f"screenshot_{timestamp}"
+            extension = ".png"
         else:
-            basename = os.path.splitext(filename)[0]
-        filename = basename + ".png"
+            basename, extension = os.path.splitext(filename)
+            if extension == "":
+                extension = ".png"
+
+        if optimize_size:
+            extension = ".webp"
+
+        filename = basename + extension
 
         with self._mutex:
             suffix = 0
             # If file with same name exists, include a suffix (number)
             while os.path.exists(os.path.join(self.log_dir, filename)):
                 suffix += 1
-                filename = f"{basename} ({suffix}).png"
-            _ = screenshot(os.path.join(self.log_dir, filename))  # pyright: ignore[ reportPossiblyUnboundVariable]
+                filename = f"{basename} ({suffix}){extension}"
+            filepath = os.path.join(self.log_dir, filename)
+            img: Image = screenshot(filepath)  # pyright: ignore[ reportPossiblyUnboundVariable]
+            if optimize_size:
+                img.save(filepath, lossless=True, optimize=True)  # pyright: ignore[ reportPossiblyUnboundVariable]
             self._logger.info(f"Screenshot captured and saved as: {filename}")
 
         return filename
@@ -601,7 +619,7 @@ class AutomationLogger:
         Captures a screenshot of a Selenium driver instance.
 
         The name of the screenshot is written with level INFO in the log file with the format:
-        log_timestamp_screenshot_selenium.png or the filename parameter.
+        selenium_screenshot_log_timestamp.png or the filename parameter.
 
         Parameters
         ----------
@@ -630,7 +648,7 @@ class AutomationLogger:
         >>> log.capture_screenshot_selenium(driver, "chromedriver_screenshot.png")
         """
 
-        if not web_enabled:
+        if not selenium_enabled:
             raise NotImplementedError(
                 "Function is only available if selenium is installed"
             )
@@ -638,8 +656,8 @@ class AutomationLogger:
         if filename is not None and not isinstance(filename, str):
             raise ValueError("filename must be a string")
 
-        timestamp = datetime.now().strftime(r"%Y_%m_%d-%H_%M_%S")
         if filename is None:
+            timestamp = datetime.now().strftime(r"%Y_%m_%d-%H_%M_%S")
             basename = f"selenium_screenshot_{timestamp}"
         else:
             basename = os.path.splitext(filename)[0]
@@ -1102,24 +1120,31 @@ def critical_else(message: str) -> None:
         print(f"{'CRITICAL':<10} | {message}")
 
 
-def capture_screenshot(filename: str | None = None):
+def capture_screenshot(filename: str | None = None, optimize_size: bool = False) -> str:
     """
     Captures a screenshot of the entire screen and saves it in the log directory.
 
     The name of the screenshot is written with level INFO in the log file with the format:
-    log_timestamp_screenshot.png or the filename parameter.
+    screenshot_log_timestamp.png (default) or the filename parameter.
 
     Parameters
     ----------
     filename : str, optional
-        Name of the screenshot. The file extension will be .png. If a file with the same
-        name already exists, the new file will be named with a suffix (x), where x is
+        Name of the screenshot. If no extension is found in filename, it will be .png if `optimize_size` = False.
+        If `optimize_size` is True, the extension will be .webp whether the extesion is found or not.
+
+        If a file with the same name already exists, the new file will be named with a suffix (x), where x is
         the number of existing files with the same name. Example: image.png, image (1).png,
         image(2).png, image(3).png.
 
+
+    optimize_size : bool
+        Flag to save the image using a memory efficient and lossless format (.webp)
+
     Returns
     -------
-    None
+    filename : str
+        The name of the file saved
 
     Raises
     ------
@@ -1139,7 +1164,7 @@ def capture_screenshot(filename: str | None = None):
     """
     if global_log is None:
         raise ValueError("This function requires the global log to be set")
-    return global_log.capture_screenshot(filename)
+    return global_log.capture_screenshot(filename, optimize_size)
 
 
 def capture_screenshot_selenium(driver: Any, filename: str | None = None) -> str:
@@ -1161,7 +1186,8 @@ def capture_screenshot_selenium(driver: Any, filename: str | None = None) -> str
 
     Returns
     -------
-    None
+    filename : str
+        The name of the file saved
 
     Raises
     ------

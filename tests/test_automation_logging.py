@@ -237,6 +237,8 @@ class TestAutomationLogger(unittest.TestCase):
             files.append(alog.capture_screenshot(f"{basename}.png"))
             files.append(alog.capture_screenshot())
 
+            files.append(alog.capture_screenshot(f"1 {basename}", optimize_size=True))
+            files.append(alog.capture_screenshot(optimize_size=True))
             for file in files:
                 self.assertTrue(
                     os.path.exists(os.path.join(alog.global_log.log_dir, file))
@@ -254,7 +256,7 @@ class TestAutomationLogger(unittest.TestCase):
             level_threshold=alog.LogLevel.INFO,
         )
 
-        if not alog.web_enabled:
+        if not alog.selenium_enabled:
             print(
                 "selenium is not installed, skipping capture_screenshot_selenium test"
             )
