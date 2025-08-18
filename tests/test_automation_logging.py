@@ -9,6 +9,7 @@ from random import randrange
 
 import automation_logging as alog
 
+
 def delete_dir(log_dir):
     if os.path.exists(log_dir):
         shutil.rmtree(log_dir)
@@ -18,16 +19,19 @@ def disconnect_all_handlers():
     """Disconnects all handlers from all loggers."""
     warnings.filterwarnings("ignore", category=ResourceWarning)
 
-    for logger in logging.Logger.manager.loggerDict.values():  # iterate over all loggers
+    for (
+        logger
+    ) in logging.Logger.manager.loggerDict.values():  # iterate over all loggers
         if isinstance(logger, logging.Logger):  # ensure it is a logger object.
-            handlers = logger.handlers[:]  # create a copy to avoid modification during iteration
+            handlers = logger.handlers[
+                :
+            ]  # create a copy to avoid modification during iteration
             for handler in handlers:
                 handler.close()
                 logger.removeHandler(handler)
 
 
 class TestAutomationLogger(unittest.TestCase):
-
     def setUp(self):
         self.log_dir = "./local/test_logs"
         self.max_logs = 2
@@ -108,7 +112,10 @@ class TestAutomationLogger(unittest.TestCase):
 
         # Try after setting the globalo log
         alog.AutomationLogger(
-            script_path=__file__, log_dir=self.log_dir, log_to_console=False, as_global_log=True
+            script_path=__file__,
+            log_dir=self.log_dir,
+            log_to_console=False,
+            as_global_log=True,
         )
 
         messages = [
@@ -175,7 +182,9 @@ class TestAutomationLogger(unittest.TestCase):
                 alog.info(f"Thread {thread_num} - Message {i}")
 
         with futures.ThreadPoolExecutor(max_workers=num_workers) as executor:
-            fts = {executor.submit(foo, thread_num) for thread_num in range(num_workers)}
+            fts = {
+                executor.submit(foo, thread_num) for thread_num in range(num_workers)
+            }
             _ = [ft.result() for ft in futures.as_completed(fts)]
 
         messages = []
@@ -215,7 +224,7 @@ class TestAutomationLogger(unittest.TestCase):
             level_threshold=alog.LogLevel.INFO,
         )
 
-        if not alog.PYAUTOGUI_INSTALLED:
+        if not alog.image_enabled:
             print("pyautogui is not installed, skipping capture_screenshot test")
             self.assertTrue(True)
         else:
@@ -229,7 +238,9 @@ class TestAutomationLogger(unittest.TestCase):
             files.append(alog.capture_screenshot())
 
             for file in files:
-                self.assertTrue(os.path.exists(os.path.join(alog.global_log.log_dir, file)))
+                self.assertTrue(
+                    os.path.exists(os.path.join(alog.global_log.log_dir, file))
+                )
 
     def test_selenium_screenshot(self):
         print(f"Running test: {self.__class__.__name__}.{self._testMethodName}")
@@ -243,8 +254,10 @@ class TestAutomationLogger(unittest.TestCase):
             level_threshold=alog.LogLevel.INFO,
         )
 
-        if not alog.SELENIUM_INSTALLED:
-            print("selenium is not installed, skipping capture_screenshot_selenium test")
+        if not alog.web_enabled:
+            print(
+                "selenium is not installed, skipping capture_screenshot_selenium test"
+            )
             self.assertTrue(True)
         else:
             from selenium import webdriver
@@ -266,7 +279,9 @@ class TestAutomationLogger(unittest.TestCase):
             files.append(alog.capture_screenshot_selenium(driver))
 
             for file in files:
-                self.assertTrue(os.path.exists(os.path.join(alog.global_log.log_dir, file)))
+                self.assertTrue(
+                    os.path.exists(os.path.join(alog.global_log.log_dir, file))
+                )
 
 
 if __name__ == "__main__":

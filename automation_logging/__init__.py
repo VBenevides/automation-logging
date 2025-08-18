@@ -1,15 +1,20 @@
 """
 Automation Logging
 ====
-* **Thread-Safe Logging:** Ensures reliable and consistent logging from multi-threaded applications, preventing message corruption.
-* **Automated Log Management:** Simplifies log file maintenance with configurable retention policies based on age or file count.
-* **Seamless Integration:** Enables effortless integration with existing projects by allowing the library to override the standard `logging` module's root logger.
-* **Integrated Screenshot Capture:** Captures informative screenshots directly within your logs, supporting full-screen captures (using `pyautogui`) and Selenium WebDriver screenshots, including headless browser support (using `selenium`).
+- Thread-Safe Logging: Ensures reliable and consistent logging from multi-threaded applications, preventing message corruption.
+- Automated Log Management: Simplifies log file maintenance with configurable retention policies based on age or file count.
+- Seamless Integration: Enables effortless integration with existing projects by allowing the library to override the standard `logging` module's root logger.
+- Integrated Screenshot Capture: Captures informative screenshots directly within your logs, supporting full-screen captures (using `pyautogui`) and Selenium WebDriver screenshots, including headless browser support (using `selenium`).
 """
 
-__version__ = "1.0.2"
+# pyright: reportUnnecessaryIsInstance=false, reportUnreachable=false, reportUnknownMemberType=false, reportMissingModuleSource=false, reportMissingImports=false, reportAny=false, reportExplicitAny=false
 
-from typing import Optional, Any
+__version__ = "1.0.3"
+
+from _thread import lock
+from logging import Logger
+from typing import Any
+from importlib.util import find_spec
 import logging
 import os
 import shutil
@@ -26,24 +31,21 @@ OPT_DISABLE_WEB = os.environ.get("alog_disable_web", "0").lower() in truthy_valu
 OPT_DISABLE_IMAGE = os.environ.get("alog_disable_image", "0").lower() in truthy_values
 
 if OPT_DISABLE_WEB:
-    SELENIUM_INSTALLED = False
+    web_enabled = False
 else:
-    try:
-        from selenium.webdriver.chrome.webdriver import WebDriver
-
-        SELENIUM_INSTALLED = True
-    except ImportError:
-        SELENIUM_INSTALLED = False
+    if find_spec("selenium") is not None:
+        web_enabled = True
+    else:
+        web_enabled = False
 
 if OPT_DISABLE_IMAGE:
-    PYAUTOGUI_INSTALLED = False
+    image_enabled = False
 else:
-    try:
+    if find_spec("pyautogui") is not None:
+        image_enabled = True
         from pyautogui import screenshot
-
-        PYAUTOGUI_INSTALLED = True
-    except ImportError:
-        PYAUTOGUI_INSTALLED = False
+    else:
+        image_enabled = False
 
 
 class LogLevel(IntEnum):
@@ -99,7 +101,7 @@ class AutomationLogger:
     def __init__(
         self,
         script_path: str,
-        log_dir: Optional[str] = None,
+        log_dir: str | None = None,
         log_to_console: bool = True,
         log_to_file: bool = True,
         max_logs: int = 60,
@@ -192,14 +194,13 @@ class AutomationLogger:
         script_name_no_ext = os.path.splitext(script_name)[0]
         log_name = f"{script_name_no_ext}.log"
 
-        self.log_dir = log_dir
-        self.log_name = log_name
-        self.threshold = level_threshold
+        self.log_dir: str = log_dir
+        self.log_name: str = log_name
+        self.threshold: LogLevel = level_threshold
         # Include private mutex to make this class thread-safe
-        self._mutex = threading.Lock()
+        self._mutex: lock = threading.Lock()
 
         try:
-
             # Delete older files and create current directory
             if log_to_file:
                 self.log_dir = self._clear_log_dir(
@@ -207,7 +208,7 @@ class AutomationLogger:
                     max_logs=max_logs,
                     max_days=max_days,
                 )
-                self.log_file = os.path.join(self.log_dir, log_name)
+                self.log_file: str = os.path.join(self.log_dir, log_name)
             else:
                 self.log_file = ""
 
@@ -225,7 +226,7 @@ class AutomationLogger:
                 " | %(levelname)-10s | %(message)s"
             )
 
-            self._logger = logging.getLogger(name=script_name)
+            self._logger: Logger = logging.getLogger(name=script_name)
             self._logger.setLevel(level_threshold.to_logging_level())
 
             self._logger.handlers = []  # Reset handlers
@@ -263,12 +264,16 @@ class AutomationLogger:
             print("Writing the error inside log_error.txt")
             file_path = os.path.abspath("log_error.txt")
             with open(file_path, "w+", encoding="utf-8") as file:
-                file.write(f"Error when instantiating AutomationLogger object: {repr(exc)}\n")
-                file.write("----------------------------------------------------------\n")
-                file.write(error_traceback)
+                _ = file.write(
+                    f"Error when instantiating AutomationLogger object: {repr(exc)}\n"
+                )
+                _ = file.write(
+                    "----------------------------------------------------------\n"
+                )
+                _ = file.write(error_traceback)
             raise exc
 
-    def _clear_log_dir(self, log_dir, max_logs, max_days) -> str:
+    def _clear_log_dir(self, log_dir: str, max_logs: int, max_days: int) -> str:
         """
         Deletes old logs and creates the directory for the current log.
 
@@ -332,13 +337,13 @@ class AutomationLogger:
         os.makedirs(log_dir, exist_ok=True)
         return log_dir
 
-    def _write(self, message: Any, level: LogLevel) -> None:
+    def _write(self, message: str, level: LogLevel) -> None:
         """Writes the message to the log file with the given level
         If the level is lower than the threshold, the message is not written
 
         Parameters
         ----------
-        message: Any
+        message: str
             Message to be logged
 
         Returns
@@ -355,7 +360,7 @@ class AutomationLogger:
             elif level == LogLevel.INFO:
                 self._logger.info(message)
             elif level == LogLevel.STAT:
-                self._logger.stat(message)
+                self._logger.stat(message)  # pyright: ignore[reportAttributeAccessIssue]
             elif level == LogLevel.WARNING:
                 self._logger.warning(message)
             elif level == LogLevel.ERROR:
@@ -367,12 +372,12 @@ class AutomationLogger:
             else:
                 print(f"Unknown log level: {level}")
 
-    def debug(self, message: Any) -> None:
+    def debug(self, message: str) -> None:
         """Writes the message to the log file with level DEBUG
 
         Parameters
         ----------
-        message : Any
+        message: str
             Message to be logged
 
         Returns
@@ -387,13 +392,13 @@ class AutomationLogger:
 
         self._write(message, LogLevel.DEBUG)
 
-    def info(self, message: Any) -> None:
+    def info(self, message: str) -> None:
         """
         Writes the message to the log file with level INFO.
 
         Parameters
         ----------
-        message : Any
+        message: str
             Message to be logged
 
         Returns
@@ -408,13 +413,13 @@ class AutomationLogger:
 
         self._write(message, LogLevel.INFO)
 
-    def warning(self, message: Any) -> None:
+    def warning(self, message: str) -> None:
         """
         Writes the message to the log file with level WARNING.
 
         Parameters
         ----------
-        message : Any
+        message: str
             Message to be logged
 
         Returns
@@ -429,7 +434,7 @@ class AutomationLogger:
 
         self._write(message, LogLevel.WARNING)
 
-    def error(self, message: Any) -> None:
+    def error(self, message: str) -> None:
         """
         Writes the message to the log file with level ERROR.
 
@@ -438,7 +443,7 @@ class AutomationLogger:
 
         Parameters
         ----------
-        message : Any
+        message: str
             Message to be logged
 
         Returns
@@ -456,13 +461,13 @@ class AutomationLogger:
 
         self._write(message, LogLevel.ERROR)
 
-    def critical(self, message: Any) -> None:
+    def critical(self, message: str) -> None:
         """
         Writes the message to the log file with level CRITICAL.
 
         Parameters
         ----------
-        message : Any
+        message: str
             Message to be logged
 
         Returns
@@ -480,7 +485,7 @@ class AutomationLogger:
 
         self._write(message, LogLevel.CRITICAL)
 
-    def exception(self, message: Any) -> None:
+    def exception(self, message: str) -> None:
         """
         Writes an exception to the log file with level ERROR.
 
@@ -489,7 +494,7 @@ class AutomationLogger:
 
         Parameters
         ----------
-        message : Any
+        message: str
             Message to be logged
 
         Returns
@@ -507,7 +512,7 @@ class AutomationLogger:
 
         self._write(message, LogLevel.EXCEPTION)
 
-    def stat(self, info_dict: Any) -> None:
+    def stat(self, message: str | dict[Any, Any]) -> None:
         """
         Writes a dictionary to the log file with level STAT.
 
@@ -516,7 +521,7 @@ class AutomationLogger:
 
         Parameters
         ----------
-        info_dict : Any
+        message: str | dict[Any, Any]
             Message to be logged
 
         Returns
@@ -530,9 +535,9 @@ class AutomationLogger:
         >>> log.stat(info_dict)
         """
 
-        self._write(info_dict, LogLevel.STAT)
+        self._write(str(message), LogLevel.STAT)
 
-    def capture_screenshot(self, filename: Optional[str] = None) -> str:
+    def capture_screenshot(self, filename: str | None = None) -> str:
         """
         Captures a screenshot of the entire screen and saves it in the log directory.
 
@@ -563,8 +568,10 @@ class AutomationLogger:
         >>> log.capture_screenshot("example_screenshot.png")
         """
 
-        if not PYAUTOGUI_INSTALLED:
-            raise NotImplementedError("Function is only available if pyautogui is installed")
+        if not image_enabled:
+            raise NotImplementedError(
+                "Function is only available if pyautogui is installed"
+            )
 
         if filename is not None and not isinstance(filename, str):
             raise ValueError("filename must be a string")
@@ -582,12 +589,14 @@ class AutomationLogger:
             while os.path.exists(os.path.join(self.log_dir, filename)):
                 suffix += 1
                 filename = f"{basename} ({suffix}).png"
-            screenshot(os.path.join(self.log_dir, filename))
+            _ = screenshot(os.path.join(self.log_dir, filename))  # pyright: ignore[ reportPossiblyUnboundVariable]
             self._logger.info(f"Screenshot captured and saved as: {filename}")
 
         return filename
 
-    def capture_screenshot_selenium(self, driver: Any, filename: Optional[str] = None) -> str:
+    def capture_screenshot_selenium(
+        self, driver: Any, filename: str | None = None
+    ) -> str:
         """
         Captures a screenshot of a Selenium driver instance.
 
@@ -621,8 +630,10 @@ class AutomationLogger:
         >>> log.capture_screenshot_selenium(driver, "chromedriver_screenshot.png")
         """
 
-        if not SELENIUM_INSTALLED:
-            raise NotImplementedError("Function is only available if selenium is installed")
+        if not web_enabled:
+            raise NotImplementedError(
+                "Function is only available if selenium is installed"
+            )
 
         if filename is not None and not isinstance(filename, str):
             raise ValueError("filename must be a string")
@@ -646,7 +657,7 @@ class AutomationLogger:
 
         return filename
 
-    def group_by_prefix(self, prefix: Optional[str] = None, sep: Optional[str] = None):
+    def group_by_prefix(self, prefix: str | None = None, sep: str | None = None):
         """
         Group files in the log directory by prefix.
         If `prefix` is given all files that don't have the prefix will be ignored.
@@ -697,7 +708,11 @@ class AutomationLogger:
                 prefixes = [str(prefix)]
             else:
                 sep = str(sep)
-                files = [x for x in os.listdir(self.log_dir) if sep in x and x != self.log_name]
+                files = [
+                    x
+                    for x in os.listdir(self.log_dir)
+                    if sep in x and x != self.log_name
+                ]
                 prefixes = set(x.split(sep)[0] for x in files)
 
             # There was a bug when a prefix is a substring of another, such as prefix1 and prefix10
@@ -709,7 +724,7 @@ class AutomationLogger:
 
             for prefix in prefixes:
                 prefix = prefix.strip()
-                files = []
+                files: list[str] = []
                 for file in os.listdir(self.log_dir):
                     if file == self.log_name or not os.path.isfile(
                         os.path.join(self.log_dir, file)
@@ -725,14 +740,14 @@ class AutomationLogger:
 
                 os.makedirs(os.path.join(self.log_dir, prefix), exist_ok=True)
                 for file in files:
-                    shutil.move(
+                    _ = shutil.move(
                         os.path.join(self.log_dir, file),
                         os.path.join(self.log_dir, prefix),
                     )
                 self._logger.info(f"Grouped files by prefix: {prefix}")
 
 
-def add_logging_level(levelName, levelNum, methodName=None):
+def add_logging_level(levelName: str, levelNum: int, methodName: str | None = None):
     """
     Comprehensively adds a new logging level to the `logging` module and the
     currently configured logging class.
@@ -802,10 +817,10 @@ def add_logging_level(levelName, levelNum, methodName=None):
 # Global Logging (no need to pass AutomationLogger between functions)
 # -------------------------------------------------------------------------------------
 
-global_log: Optional[AutomationLogger] = None
+global_log: AutomationLogger | None = None
 
 
-def set_global_log(logger):
+def set_global_log(logger: AutomationLogger) -> None:
     """
     Set the global log object of the `automation_logging` module
 
@@ -835,12 +850,12 @@ def set_global_log(logger):
     global_log = logger
 
 
-def debug(message: Any) -> None:
+def debug(message: str) -> None:
     """Writes the message to the log file with level DEBUG
 
     Parameters
     ----------
-    message : Any
+    message: str
         Message to be logged
 
     Returns
@@ -862,7 +877,7 @@ def debug(message: Any) -> None:
     global_log.debug(message)
 
 
-def debug_else(message: Any) -> None:
+def debug_else(message: str) -> None:
     """Calls debug if global_log is set, else calls print"""
     if global_log is not None:
         debug(message)
@@ -870,12 +885,12 @@ def debug_else(message: Any) -> None:
         print(f"{'DEBUG':<10} | {message}")
 
 
-def info(message: Any) -> None:
+def info(message: str) -> None:
     """Writes the message to the log file with level INFO
 
     Parameters
     ----------
-    message : Any
+    message: str
         Message to be logged
 
     Returns
@@ -897,7 +912,7 @@ def info(message: Any) -> None:
     global_log.info(message)
 
 
-def info_else(message: Any) -> None:
+def info_else(message: str) -> None:
     """Calls info if global_log is set, else calls print"""
     if global_log is not None:
         info(message)
@@ -905,12 +920,12 @@ def info_else(message: Any) -> None:
         print(f"{'INFO':<10} | {message}")
 
 
-def stat(message: Any) -> None:
+def stat(message: str | dict[Any, Any]) -> None:
     """Writes the message to the log file with level STAT
 
     Parameters
     ----------
-    message : Any
+    message: str | dict[Any, Any]
         Message to be logged
 
     Returns
@@ -933,7 +948,7 @@ def stat(message: Any) -> None:
     global_log.stat(message)
 
 
-def stat_else(message: Any) -> None:
+def stat_else(message: str) -> None:
     """Calls stat if global_log is set, else calls print"""
     if global_log is not None:
         stat(message)
@@ -941,12 +956,12 @@ def stat_else(message: Any) -> None:
         print(f"{'STAT':<10} | {message}")
 
 
-def warning(message: Any) -> None:
+def warning(message: str) -> None:
     """Writes the message to the log file with level WARNING
 
     Parameters
     ----------
-    message : Any
+    message: str
         Message to be logged
 
     Returns
@@ -968,7 +983,7 @@ def warning(message: Any) -> None:
     global_log.warning(message)
 
 
-def warning_else(message: Any) -> None:
+def warning_else(message: str) -> None:
     """Calls warning if global_log is set, else calls print"""
     if global_log is not None:
         debug(message)
@@ -976,12 +991,12 @@ def warning_else(message: Any) -> None:
         print(f"{'WARNING':<10} | {message}")
 
 
-def error(message: Any) -> None:
+def error(message: str) -> None:
     """Writes the message to the log file with level ERROR
 
     Parameters
     ----------
-    message : Any
+    message: str
         Message to be logged
 
     Returns
@@ -1003,7 +1018,7 @@ def error(message: Any) -> None:
     global_log.error(message)
 
 
-def error_else(message: Any) -> None:
+def error_else(message: str) -> None:
     """Calls error if global_log is set, else calls print"""
     if global_log is not None:
         error(message)
@@ -1011,12 +1026,12 @@ def error_else(message: Any) -> None:
         print(f"{'ERROR':<10} | {message}")
 
 
-def exception(message: Any) -> None:
+def exception(message: str) -> None:
     """Writes the message to the log file with level EXCEPTION
 
     Parameters
     ----------
-    message : Any
+    message: str
         Message to be logged
 
     Returns
@@ -1041,7 +1056,7 @@ def exception(message: Any) -> None:
     global_log.exception(message)
 
 
-def exception_else(message: Any) -> None:
+def exception_else(message: str) -> None:
     """Calls exception if global_log is set, else calls print"""
     if global_log is not None:
         exception(message)
@@ -1049,12 +1064,12 @@ def exception_else(message: Any) -> None:
         print(f"{'EXCEPTION':<10} | {message}")
 
 
-def critical(message: Any) -> None:
+def critical(message: str) -> None:
     """Writes the message to the log file with level CRITICAL
 
     Parameters
     ----------
-    message : Any
+    message: str
         Message to be logged
 
     Returns
@@ -1079,7 +1094,7 @@ def critical(message: Any) -> None:
     global_log.critical(message)
 
 
-def critical_else(message: Any) -> None:
+def critical_else(message: str) -> None:
     """Calls critical if global_log is set, else calls print"""
     if global_log is not None:
         critical(message)
@@ -1087,7 +1102,7 @@ def critical_else(message: Any) -> None:
         print(f"{'CRITICAL':<10} | {message}")
 
 
-def capture_screenshot(filename: Optional[str] = None):
+def capture_screenshot(filename: str | None = None):
     """
     Captures a screenshot of the entire screen and saves it in the log directory.
 
@@ -1127,7 +1142,7 @@ def capture_screenshot(filename: Optional[str] = None):
     return global_log.capture_screenshot(filename)
 
 
-def capture_screenshot_selenium(driver: Any, filename: Optional[str] = None) -> str:
+def capture_screenshot_selenium(driver: Any, filename: str | None = None) -> str:
     """
     Captures a screenshot of a Selenium driver instance.
 
@@ -1170,7 +1185,7 @@ def capture_screenshot_selenium(driver: Any, filename: Optional[str] = None) -> 
     return global_log.capture_screenshot_selenium(driver, filename)
 
 
-def group_by_prefix(prefix: Optional[str] = None, sep: Optional[str] = None) -> None:
+def group_by_prefix(prefix: str | None = None, sep: str | None = None) -> None:
     """
     Group files in the log directory by prefix.
     If `prefix` is given all files that don't have the prefix will be ignored.

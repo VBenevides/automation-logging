@@ -16,9 +16,9 @@ extras_require = {
 with open("README.md", "r", encoding="utf-8") as file:
     long_description = file.read()
 
-setup(
+_ = setup(
     name="automation-logging",
-    version="1.0.5",
+    version="1.0.3",
     packages=["automation_logging"],
     url="https://github.com/VBenevides/automation-logging",
     license="MIT",
