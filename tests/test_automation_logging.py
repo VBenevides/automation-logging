@@ -19,13 +19,9 @@ def disconnect_all_handlers():
     """Disconnects all handlers from all loggers."""
     warnings.filterwarnings("ignore", category=ResourceWarning)
 
-    for (
-        logger
-    ) in logging.Logger.manager.loggerDict.values():  # iterate over all loggers
+    for logger in logging.Logger.manager.loggerDict.values():  # iterate over all loggers
         if isinstance(logger, logging.Logger):  # ensure it is a logger object.
-            handlers = logger.handlers[
-                :
-            ]  # create a copy to avoid modification during iteration
+            handlers = logger.handlers[:]  # create a copy to avoid modification during iteration
             for handler in handlers:
                 handler.close()
                 logger.removeHandler(handler)
@@ -182,9 +178,7 @@ class TestAutomationLogger(unittest.TestCase):
                 alog.info(f"Thread {thread_num} - Message {i}")
 
         with futures.ThreadPoolExecutor(max_workers=num_workers) as executor:
-            fts = {
-                executor.submit(foo, thread_num) for thread_num in range(num_workers)
-            }
+            fts = {executor.submit(foo, thread_num) for thread_num in range(num_workers)}
             _ = [ft.result() for ft in futures.as_completed(fts)]
 
         messages = []
@@ -240,9 +234,7 @@ class TestAutomationLogger(unittest.TestCase):
             files.append(alog.capture_screenshot(f"1 {basename}", optimize_size=True))
             files.append(alog.capture_screenshot(optimize_size=True))
             for file in files:
-                self.assertTrue(
-                    os.path.exists(os.path.join(alog.get_global_log().log_dir, file))
-                )
+                self.assertTrue(os.path.exists(os.path.join(alog.get_global_log().log_dir, file)))
 
     def test_selenium_screenshot(self):
         print(f"Running test: {self.__class__.__name__}.{self._testMethodName}")
@@ -257,16 +249,14 @@ class TestAutomationLogger(unittest.TestCase):
         )
 
         if not alog.web_enabled:
-            print(
-                "selenium is not installed, skipping capture_screenshot_selenium test"
-            )
+            print("selenium is not installed, skipping capture_screenshot_selenium test")
             self.assertTrue(True)
         else:
             from selenium import webdriver
             from selenium.webdriver.chrome.options import Options
             from selenium.webdriver.chrome.service import Service
 
-            service = Service("chromedriver.exe")
+            service = Service()
             options = Options()
             options.add_argument("--headless=new")
             driver = webdriver.Chrome(options=options, service=service)
@@ -281,9 +271,7 @@ class TestAutomationLogger(unittest.TestCase):
             files.append(alog.capture_screenshot_selenium(driver))
 
             for file in files:
-                self.assertTrue(
-                    os.path.exists(os.path.join(alog.get_global_log().log_dir, file))
-                )
+                self.assertTrue(os.path.exists(os.path.join(alog.get_global_log().log_dir, file)))
 
 
 if __name__ == "__main__":
