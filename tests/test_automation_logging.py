@@ -36,7 +36,7 @@ class TestAutomationLogger(unittest.TestCase):
         self.log_dir = "./local/test_logs"
         self.max_logs = 2
         delete_dir(self.log_dir)
-        alog.global_log = None
+        alog.global_logger.global_log = None
 
     def tearDown(self):
         disconnect_all_handlers()
@@ -110,8 +110,8 @@ class TestAutomationLogger(unittest.TestCase):
         # Try before setting the global log and functions using else
         alog.info_else("info_else message")
 
-        # Try after setting the globalo log
-        alog.AutomationLogger(
+        # Try after setting the global log
+        _ = alog.AutomationLogger(
             script_path=__file__,
             log_dir=self.log_dir,
             log_to_console=False,
@@ -125,7 +125,7 @@ class TestAutomationLogger(unittest.TestCase):
         alog.info(messages[0])
         alog.info_else(messages[1])
 
-        with open(alog.global_log.log_file, "r", encoding="utf-8") as file:
+        with open(alog.get_global_log().log_file, "r", encoding="utf-8") as file:
             content = file.read()
             for msg in messages:
                 self.assertIn(msg, content)
@@ -191,7 +191,7 @@ class TestAutomationLogger(unittest.TestCase):
         for i in range(num_workers):
             for j in range(num_msg_per_worker):
                 messages.append(f"Thread {i} - Message {j}")
-        with open(alog.global_log.log_file, "r", encoding="utf-8") as file:
+        with open(alog.get_global_log().log_file, "r", encoding="utf-8") as file:
             content = file.read()
             for msg in messages:
                 self.assertIn(msg, content)
@@ -241,7 +241,7 @@ class TestAutomationLogger(unittest.TestCase):
             files.append(alog.capture_screenshot(optimize_size=True))
             for file in files:
                 self.assertTrue(
-                    os.path.exists(os.path.join(alog.global_log.log_dir, file))
+                    os.path.exists(os.path.join(alog.get_global_log().log_dir, file))
                 )
 
     def test_selenium_screenshot(self):
@@ -256,7 +256,7 @@ class TestAutomationLogger(unittest.TestCase):
             level_threshold=alog.LogLevel.INFO,
         )
 
-        if not alog.selenium_enabled:
+        if not alog.web_enabled:
             print(
                 "selenium is not installed, skipping capture_screenshot_selenium test"
             )
@@ -282,7 +282,7 @@ class TestAutomationLogger(unittest.TestCase):
 
             for file in files:
                 self.assertTrue(
-                    os.path.exists(os.path.join(alog.global_log.log_dir, file))
+                    os.path.exists(os.path.join(alog.get_global_log().log_dir, file))
                 )
 
 
