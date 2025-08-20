@@ -1,7 +1,9 @@
 from threading import Lock
 from logging import Logger
+from types import FrameType
 from typing import Any
 import logging
+import inspect
 import os
 import shutil
 import sys
@@ -10,6 +12,7 @@ import traceback
 import time
 import platform
 import atexit
+import weakref
 from enum import IntEnum
 from datetime import datetime, timedelta
 
@@ -196,22 +199,18 @@ class AutomationLogger:
             else:
                 complete_user = f"{user_domain}\\{getpass.getuser()}"
             # Configuring the logger object
-            # include -10s to levelname to make all messages start at the same column
-            _log_format = (
-                f"%(asctime)s | {system_name} | {complete_user} | %(name)s"
-                " | %(levelname)-10s | %(message)s"
-            )
-
             self._logger: Logger = logging.getLogger(name=script_name)
             self._logger.setLevel(level_threshold.to_logging_level())
 
             self._logger.handlers = []  # Reset handlers
 
-            # Formatter
-            formatter = logging.Formatter(_log_format, datefmt="%Y-%m-%d %H:%M:%S%z")
-
             # log to file
             if log_to_file:
+                log_format = (
+                    f"%(asctime)s | {system_name} | {complete_user} | %(name)s"
+                    " | %(levelname)s | %(frame_info)s | %(message)s"
+                )
+                formatter = logging.Formatter(log_format, datefmt="%Y-%m-%d %H:%M:%S%z")
                 file_handler = logging.FileHandler(self.log_file, encoding=encoding)
                 file_handler.setLevel(level_threshold.to_logging_level())
                 file_handler.setFormatter(formatter)
@@ -219,7 +218,12 @@ class AutomationLogger:
 
             # print in console
             if log_to_console:
-                self._logger.addHandler(logging.StreamHandler(sys.stdout))
+                log_format = "%(asctime)s | %(name)s | %(levelname)s | %(message)s"
+                formatter = logging.Formatter(log_format, datefmt="%Y-%m-%d %H:%M:%S%z")
+                console_handler = logging.StreamHandler(sys.stdout)
+                console_handler.setLevel(level_threshold.to_logging_level())
+                console_handler.setFormatter(formatter)
+                self._logger.addHandler(console_handler)
 
             # Create new log level
             add_logging_level("STAT", LogLevel.STAT.to_logging_level())
@@ -236,7 +240,7 @@ class AutomationLogger:
             if log_to_file:
                 self._screenshot_manager = ScreenshotManager(self.log_dir, self._logger)
 
-            _ = atexit.register(self.log_profilers)
+            _ = atexit.register(self._exit_weak())
             self.info("AutomationLogger object instantiated")
         except Exception as exc:
             print(f"Error when instantiating AutomationLogger object: {repr(exc)}")
@@ -314,6 +318,33 @@ class AutomationLogger:
         os.makedirs(log_dir, exist_ok=True)
         return log_dir
 
+    def _get_frame_info(self) -> str:
+        """Get frame info from the last frame before entering automation_logging modules"""
+
+        nf_alog = False
+        cf_alog = False
+        frames: list[tuple[FrameType, str]] = []
+        frame = inspect.currentframe()
+        while frame:
+            frames.append((frame, inspect.getfile(frame)))
+            frame = frame.f_back
+        frame_data: dict[str, Any] = {}
+        for i in range(len(frames) - 1, 0, -1):
+            cf = frames[i]
+            nf = frames[i - 1]
+            cf_alog = "automation_logging" in cf[1]
+            nf_alog = "automation_logging" in nf[1]
+            if nf_alog and not cf_alog:
+                frame = cf[0]
+                frame_data["module"] = inspect.getmodulename(inspect.getfile(frame))
+                frame_data["lineno"] = inspect.getlineno(frame)
+                frame_data["function"] = frame.f_code.co_name
+                break
+
+        if len(frame_data) == 0:
+            return "-"
+        return f"{frame_data['module']}.{frame_data['function']}:{frame_data['lineno']}"
+
     def _write(self, message: str, level: LogLevel) -> None:
         """Writes the message to the log file with the given level
         If the level is lower than the threshold, the message is not written
@@ -331,21 +362,23 @@ class AutomationLogger:
         if level < self.threshold:
             return None
 
+        frame_info = self._get_frame_info()
+
         with self._mutex:
             if level == LogLevel.DEBUG:
-                self._logger.debug(message)
+                self._logger.debug(message, extra={"frame_info": frame_info})
             elif level == LogLevel.INFO:
-                self._logger.info(message)
+                self._logger.info(message, extra={"frame_info": frame_info})
             elif level == LogLevel.STAT:
-                self._logger.stat(message)  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]
+                self._logger.stat(message, extra={"frame_info": frame_info})  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]
             elif level == LogLevel.WARNING:
-                self._logger.warning(message)
+                self._logger.warning(message, extra={"frame_info": frame_info})
             elif level == LogLevel.ERROR:
-                self._logger.error(message)
+                self._logger.error(message, extra={"frame_info": frame_info})
             elif level == LogLevel.EXCEPTION:
-                self._logger.exception(message)
+                self._logger.exception(message, extra={"frame_info": frame_info})
             elif level == LogLevel.CRITICAL:
-                self._logger.critical(message)
+                self._logger.critical(message, extra={"frame_info": frame_info})
 
     def debug(self, message: str) -> None:
         """Writes the message to the log file with level DEBUG
@@ -587,6 +620,16 @@ class AutomationLogger:
 
         if name not in self._profilers:
             self._profilers[name] = prof
+
+    def _exit_weak(self):
+        weak_self = weakref.ref(self)
+
+        def callback():
+            obj = weak_self()
+            if obj is not None:
+                return obj.log_profilers()
+
+        return callback
 
     def log_profilers(self) -> str:
         """
