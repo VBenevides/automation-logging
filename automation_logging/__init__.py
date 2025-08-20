@@ -5,9 +5,10 @@ Automation Logging
 - Automated Log Management: Simplifies log file maintenance with configurable retention policies based on age or file count.
 - Seamless Integration: Enables effortless integration with existing projects by allowing the library to override the standard `logging` module's root logger.
 - Integrated Screenshot Capture: Captures informative screenshots directly within your logs, supporting full-screen captures (using `pyautogui`) and Selenium WebDriver screenshots, including headless browser support (using `selenium`).
+- Performance Profiling: Capture elapsed and CPU times of functions using decorators and log the results.
 """
 
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 
 # Import core components
 from .core import LogLevel, AutomationLogger
@@ -33,14 +34,17 @@ from .global_logger import (
     capture_screenshot,
     capture_screenshot_selenium,
     group_by_prefix,
+    log_profilers,
 )
 from .config import image_enabled, web_enabled
+from .profiler import Profiler
 
 __all__ = [
     # Core classes
     "LogLevel",
     "AutomationLogger",
     "ScreenshotManager",
+    "Profiler",
     # Global logging functions
     "set_global_log",
     "get_global_log",
@@ -61,6 +65,7 @@ __all__ = [
     "capture_screenshot",
     "capture_screenshot_selenium",
     "group_by_prefix",
+    "log_profilers",
     # Utilities
     "add_logging_level",
     # Configuration

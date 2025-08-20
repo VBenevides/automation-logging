@@ -1,6 +1,7 @@
 import os
 import shutil
 from concurrent import futures
+from random import randint
 import unittest
 import time
 import warnings
@@ -9,8 +10,10 @@ from random import randrange
 
 import automation_logging as alog
 
+# pyright: reportAttributeAccessIssue=false, reportUnknownMemberType=false, reportImplicitOverride=false, reportOptionalMemberAccess=false, reportUnknownArgumentType=false
 
-def delete_dir(log_dir):
+
+def delete_dir(log_dir: str):
     if os.path.exists(log_dir):
         shutil.rmtree(log_dir)
 
@@ -29,8 +32,8 @@ def disconnect_all_handlers():
 
 class TestAutomationLogger(unittest.TestCase):
     def setUp(self):
-        self.log_dir = "./local/test_logs"
-        self.max_logs = 2
+        self.log_dir: str = "./local/test_logs"  # pyright: ignore[reportUninitializedInstanceVariable]
+        self.max_logs: int = 2  # pyright: ignore[reportUninitializedInstanceVariable]
         delete_dir(self.log_dir)
         alog.global_logger.global_log = None
 
@@ -160,7 +163,7 @@ class TestAutomationLogger(unittest.TestCase):
     def test_threads(self):
         print(f"Running test: {self.__class__.__name__}.{self._testMethodName}")
 
-        alog.AutomationLogger(
+        _ = alog.AutomationLogger(
             script_path=__file__,
             log_dir=self.log_dir,
             log_to_console=False,
@@ -172,7 +175,7 @@ class TestAutomationLogger(unittest.TestCase):
         num_workers = 5
         num_msg_per_worker = 3
 
-        def foo(thread_num):
+        def foo(thread_num: int):
             for i in range(num_msg_per_worker):
                 time.sleep(randrange(50, 300) / 1000)
                 alog.info(f"Thread {thread_num} - Message {i}")
@@ -181,7 +184,7 @@ class TestAutomationLogger(unittest.TestCase):
             fts = {executor.submit(foo, thread_num) for thread_num in range(num_workers)}
             _ = [ft.result() for ft in futures.as_completed(fts)]
 
-        messages = []
+        messages: list[str] = []
         for i in range(num_workers):
             for j in range(num_msg_per_worker):
                 messages.append(f"Thread {i} - Message {j}")
@@ -194,7 +197,7 @@ class TestAutomationLogger(unittest.TestCase):
         print(f"Running test: {self.__class__.__name__}.{self._testMethodName}")
 
         for _ in range(2 * self.max_logs):
-            alog.AutomationLogger(
+            _ = alog.AutomationLogger(
                 script_path=__file__,
                 log_dir=self.log_dir,
                 max_logs=self.max_logs,
@@ -209,7 +212,7 @@ class TestAutomationLogger(unittest.TestCase):
     def test_screenshot(self):
         print(f"Running test: {self.__class__.__name__}.{self._testMethodName}")
 
-        alog.AutomationLogger(
+        _ = alog.AutomationLogger(
             script_path=__file__,
             log_dir=self.log_dir,
             log_to_console=False,
@@ -222,7 +225,7 @@ class TestAutomationLogger(unittest.TestCase):
             print("pyautogui is not installed, skipping capture_screenshot test")
             self.assertTrue(True)
         else:
-            files = []
+            files: list[str] = []
             basename = "capture_screenshot"
             files.append(alog.capture_screenshot(f"{basename}.png"))
 
@@ -239,7 +242,7 @@ class TestAutomationLogger(unittest.TestCase):
     def test_selenium_screenshot(self):
         print(f"Running test: {self.__class__.__name__}.{self._testMethodName}")
 
-        alog.AutomationLogger(
+        _ = alog.AutomationLogger(
             script_path=__file__,
             log_dir=self.log_dir,
             log_to_console=False,
@@ -261,7 +264,7 @@ class TestAutomationLogger(unittest.TestCase):
             options.add_argument("--headless=new")
             driver = webdriver.Chrome(options=options, service=service)
             driver.get("https://google.com")
-            files = []
+            files: list[str] = []
             basename = "capture_screenshot_selenium"
             files.append(alog.capture_screenshot_selenium(driver, f"{basename}.png"))
 
@@ -273,6 +276,48 @@ class TestAutomationLogger(unittest.TestCase):
             for file in files:
                 self.assertTrue(os.path.exists(os.path.join(alog.get_global_log().log_dir, file)))
 
+    def test_profilers(self):
+        print(f"Running test: {self.__class__.__name__}.{self._testMethodName}")
+
+        _ = alog.AutomationLogger(
+            script_path=__file__,
+            log_dir=self.log_dir,
+            log_to_console=False,
+            as_logging_root=True,
+            as_global_log=True,
+            level_threshold=alog.LogLevel.INFO,
+        )
+
+        @alog.Profiler("s")
+        def func1():
+            time.sleep(randint(100, 200) / 1000)
+
+            i = 0
+            for _ in range(int(1e5)):
+                i += 1
+
+        @alog.Profiler("s")
+        def func2():
+            i = 0
+            for _ in range(int(1e6)):
+                i += 1
+
+        num_call_1 = randint(2, b=5)
+        for _ in range(num_call_1):
+            func1()
+
+        num_call_2 = randint(30, 35)
+        for _ in range(num_call_2):
+            func2()
+
+        msg = alog.log_profilers()
+
+        assert "Logger instance holds 2 profilers." in msg, (
+            "Incorrect number of profilers in logger"
+        )
+        assert f"Times called: {num_call_1}" in msg, "Incorrect number of function calls for func1"
+        assert f"Times called: {num_call_2}" in msg, "Incorrect number of function calls for func2"
+
 
 if __name__ == "__main__":
-    unittest.main()
+    _ = unittest.main()

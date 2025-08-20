@@ -1,7 +1,3 @@
-"""
-Screenshot functionality for automation logging library.
-"""
-
 import os
 import shutil
 from datetime import datetime
@@ -29,9 +25,7 @@ class ScreenshotManager:
         self._logger = logger
         self._mutex: Lock = Lock()
 
-    def capture_screenshot(
-        self, filename: str | None = None, optimize_size: bool = False
-    ) -> str:
+    def capture_screenshot(self, filename: str | None = None, optimize_size: bool = False) -> str:
         """
         Captures a screenshot of the entire screen and saves it in the log directory.
 
@@ -105,9 +99,7 @@ class ScreenshotManager:
 
         return filename
 
-    def capture_screenshot_selenium(
-        self, driver: Any, filename: str | None = None
-    ) -> str:
+    def capture_screenshot_selenium(self, driver: Any, filename: str | None = None) -> str:
         """
         Captures a screenshot of a Selenium driver instance.
 
@@ -144,9 +136,7 @@ class ScreenshotManager:
         """
 
         if not web_enabled:
-            raise NotImplementedError(
-                "Function is only available if selenium is installed"
-            )
+            raise NotImplementedError("Function is only available if selenium is installed")
 
         if filename is not None and not isinstance(filename, str):
             raise ValueError("filename must be a string")
@@ -221,11 +211,7 @@ class ScreenshotManager:
                 prefixes = [str(prefix)]
             else:
                 sep = str(sep)
-                files = [
-                    x
-                    for x in os.listdir(self.log_dir)
-                    if sep in x and x != self._logger.name
-                ]
+                files = [x for x in os.listdir(self.log_dir) if sep in x and x != self._logger.name]
                 prefixes = set(x.split(sep)[0] for x in files)
 
             # There was a bug when a prefix is a substring of another, such as prefix1 and prefix10

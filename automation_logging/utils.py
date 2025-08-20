@@ -1,13 +1,7 @@
-"""
-Utility functions for automation logging library.
-"""
-
 import logging
 
 
-def add_logging_level(
-    levelName: str, levelNum: int, methodName: str | None = None
-) -> None:
+def add_logging_level(levelName: str, levelNum: int, methodName: str | None = None) -> None:
     """
     Comprehensively adds a new logging level to the `logging` module and the
     currently configured logging class.
