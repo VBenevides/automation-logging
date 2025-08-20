@@ -36,13 +36,13 @@ class Profiler:
         self.module = func.__module__
         self.name = func.__name__
 
-        # if the global log is set, store the this Profiler instance
-        log = get_global_log()
-        if log is not None:
-            log.insert_profiler(f"{self.module}.{self.name}", self)
-
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
+            # if the global log is set, store this Profiler instance
+            log = get_global_log()
+            if log is not None:
+                log.insert_profiler(f"{self.module}.{self.name}", self)
+
             start_elapsed_time = time.perf_counter_ns()
             start_cpu_time = time.process_time_ns()
             retval = func(*args, **kwargs)
