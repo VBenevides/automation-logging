@@ -27,8 +27,8 @@ class Profiler:
         msg = (
             f"Function: {self.module}.{self.name}\n"
             f"Times called: {self.times_called}\n"
-            f"Elapsed Time (Total: {self.elapsed_time_total}, Avg: {self.elapsed_time_avg}, Max: {self.elapsed_time_max})\n"
-            f"CPU Time (Total: {self.cpu_time_total}, Avg: {self.cpu_time_avg}, Max: {self.cpu_time_max}, Ratio: {self.cpu_time_ratio})\n"
+            f"Elapsed Time (Total: {self.elapsed_time_total} {self.unit}, Avg: {self.elapsed_time_avg} {self.unit}, Max: {self.elapsed_time_max} {self.unit})\n"
+            f"CPU Time (Total: {self.cpu_time_total} {self.unit}, Avg: {self.cpu_time_avg} {self.unit}, Max: {self.cpu_time_max} {self.unit}, Ratio: {self.cpu_time_ratio})\n"
         )
         return msg
 

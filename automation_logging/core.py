@@ -7,7 +7,9 @@ import shutil
 import sys
 import getpass
 import traceback
+import time
 import platform
+import atexit
 from enum import IntEnum
 from datetime import datetime, timedelta
 
@@ -172,6 +174,7 @@ class AutomationLogger:
 
         # Initialize an dict for storing profilers
         self._profilers: dict[str, IProfiler] = {}
+        self.start_time: float = time.time()
 
         try:
             # Delete older files and create current directory
@@ -233,6 +236,7 @@ class AutomationLogger:
             if log_to_file:
                 self._screenshot_manager = ScreenshotManager(self.log_dir, self._logger)
 
+            _ = atexit.register(self.log_profilers)
             self.info("AutomationLogger object instantiated")
         except Exception as exc:
             print(f"Error when instantiating AutomationLogger object: {repr(exc)}")
@@ -583,3 +587,19 @@ class AutomationLogger:
 
         if name not in self._profilers:
             self._profilers[name] = prof
+
+    def log_profilers(self):
+        """Log the dictionary of profilers as a STAT block"""
+
+        num_profilers = len(self._profilers)
+        if num_profilers == 0:
+            return None
+
+        elapsed_time_logger = time.time() - self.start_time
+        message = (
+            f"Logger instance holds {num_profilers} {'profiler' if num_profilers == 1 else 'profilers'}. "
+            f"Time since instance was created: {elapsed_time_logger} seconds.\n"
+        )
+        for prof in self._profilers.values():
+            message += "> " + repr(prof) + "\n"
+        self.stat(message)
