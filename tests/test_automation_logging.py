@@ -288,7 +288,7 @@ class TestAutomationLogger(unittest.TestCase):
             level_threshold=alog.LogLevel.INFO,
         )
 
-        @alog.Profiler("ns")
+        @alog.Profiler("s")
         def func1():
             time.sleep(randint(100, 200) / 1000)
 
@@ -296,19 +296,27 @@ class TestAutomationLogger(unittest.TestCase):
             for _ in range(int(1e5)):
                 i += 1
 
-        @alog.Profiler("ms")
+        @alog.Profiler("s")
         def func2():
             i = 0
             for _ in range(int(1e6)):
                 i += 1
 
-        for _ in range(10):
+        num_call_1 = randint(2, b=5)
+        for _ in range(num_call_1):
             func1()
 
-        for _ in range(5):
+        num_call_2 = randint(30, 35)
+        for _ in range(num_call_2):
             func2()
 
-        alog.get_global_log().log_profilers()
+        msg = alog.log_profilers()
+
+        assert "Logger instance holds 2 profilers." in msg, (
+            "Incorrect number of profilers in logger"
+        )
+        assert f"Times called: {num_call_1}" in msg, "Incorrect number of function calls for func1"
+        assert f"Times called: {num_call_2}" in msg, "Incorrect number of function calls for func2"
 
 
 if __name__ == "__main__":
