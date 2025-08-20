@@ -588,12 +588,27 @@ class AutomationLogger:
         if name not in self._profilers:
             self._profilers[name] = prof
 
-    def log_profilers(self):
-        """Log the dictionary of profilers as a STAT block"""
+    def log_profilers(self) -> str:
+        """
+        Write profilers captured by the logger to a STAT message
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        message : str
+            The message that was logged/printed
+
+        Raises
+        ------
+        None
+        """
 
         num_profilers = len(self._profilers)
         if num_profilers == 0:
-            return None
+            return ""
 
         elapsed_time_logger = time.time() - self.start_time
         message = (
@@ -603,3 +618,4 @@ class AutomationLogger:
         for prof in self._profilers.values():
             message += "> " + repr(prof) + "\n"
         self.stat(message)
+        return message

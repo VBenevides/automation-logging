@@ -471,3 +471,30 @@ def group_by_prefix(prefix: str | None = None, sep: str | None = None) -> None:
     if global_log is None:
         raise ValueError("This function requires the global log to be set")
     global_log.group_by_prefix(prefix, sep)
+
+
+def log_profilers() -> str:
+    """
+    Write profilers captured by the logger to a STAT message
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    message : str
+        The message that was logged/printed
+
+    Raises
+    ------
+    ValueError
+        If global log is not set
+
+    Notes
+    -----
+    This function is thread-safe
+    """
+    if global_log is None:
+        raise ValueError("This function requires the global log to be set")
+    return global_log.log_profilers()

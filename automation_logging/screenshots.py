@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Any
 from threading import Lock
 
-from config import image_enabled, web_enabled, screenshot, Image
+from .config import image_enabled, web_enabled, screenshot, Image
 
 
 class ScreenshotManager:

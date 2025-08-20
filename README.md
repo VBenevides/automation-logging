@@ -6,6 +6,7 @@ Logging library for automation, offering thread-safety, log cleanup and screensh
 * **Automated Log Management:** Simplifies log file maintenance with configurable retention policies based on age or file count.
 * **Seamless Integration:** Enables effortless integration with existing projects by allowing the library to override the standard `logging` module's root logger.
 * **Integrated Screenshot Capture:** Captures informative screenshots directly within your logs, supporting full-screen captures (using `pyautogui`) and Selenium WebDriver screenshots, including headless browser support (using `selenium`).
+* **Performance Profiling:** Capture elapsed and CPU times of functions using decorators and log the results.
 
 -----------
 
