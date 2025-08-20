@@ -7,7 +7,7 @@ Automation Logging
 - Integrated Screenshot Capture: Captures informative screenshots directly within your logs, supporting full-screen captures (using `pyautogui`) and Selenium WebDriver screenshots, including headless browser support (using `selenium`).
 """
 
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 
 # Import core components
 from .core import LogLevel, AutomationLogger

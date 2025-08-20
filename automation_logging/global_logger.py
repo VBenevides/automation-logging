@@ -1,35 +1,12 @@
-"""
-Global logging functionality for automation logging library.
-"""
+from typing import Any
 
-from typing import Any, Protocol, runtime_checkable
-
-
-@runtime_checkable
-class SupportsAutomationLogger(Protocol):
-    def debug(self, message: str) -> None: ...
-    def info(self, message: str) -> None: ...
-    def stat(self, message: str | dict[Any, Any]) -> None: ...
-    def warning(self, message: str) -> None: ...
-    def error(self, message: str) -> None: ...
-    def exception(self, message: str) -> None: ...
-    def critical(self, message: str) -> None: ...
-    def capture_screenshot(
-        self, filename: str | None = None, optimize_size: bool = False
-    ) -> str: ...
-    def capture_screenshot_selenium(
-        self, driver: Any, filename: str | None = None
-    ) -> str: ...
-    def group_by_prefix(
-        self, prefix: str | None = None, sep: str | None = None
-    ) -> None: ...
-
+from .protocols import IAutomationLogger
 
 # Global logger instance
-global_log: SupportsAutomationLogger | None = None
+global_log: IAutomationLogger | None = None
 
 
-def get_global_log() -> SupportsAutomationLogger | None:
+def get_global_log() -> IAutomationLogger | None:
     """
     Returns the value of the global_log variable
     """
@@ -37,7 +14,7 @@ def get_global_log() -> SupportsAutomationLogger | None:
     return global_log
 
 
-def set_global_log(logger: SupportsAutomationLogger) -> None:
+def set_global_log(logger: IAutomationLogger) -> None:
     """
     Set the global log object of the `automation_logging` module
 

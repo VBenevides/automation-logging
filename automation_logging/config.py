@@ -1,7 +1,3 @@
-"""
-Configuration and dependency management for automation logging library.
-"""
-
 import os
 from importlib.util import find_spec
 
@@ -20,9 +16,7 @@ else:
 if OPT_DISABLE_IMAGE:
     image_enabled = False
 else:
-    image_enabled = (
-        find_spec(name="pyautogui") is not None and find_spec(name="PIL") is not None
-    )
+    image_enabled = find_spec(name="pyautogui") is not None and find_spec(name="PIL") is not None
 
 # Import screenshot function if available
 if image_enabled:

@@ -1,7 +1,3 @@
-"""
-Core logging functionality for automation logging library.
-"""
-
 from threading import Lock
 from logging import Logger
 from typing import Any
@@ -18,6 +14,7 @@ from datetime import datetime, timedelta
 from .utils import add_logging_level
 from .screenshots import ScreenshotManager
 from .global_logger import set_global_log
+from .protocols import IProfiler
 
 
 class LogLevel(IntEnum):
@@ -173,6 +170,9 @@ class AutomationLogger:
         # Initialize screenshot manager
         self._screenshot_manager: ScreenshotManager | None = None
 
+        # Initialize an dict for storing profilers
+        self._profilers: dict[str, IProfiler] = {}
+
         try:
             # Delete older files and create current directory
             if log_to_file:
@@ -227,7 +227,7 @@ class AutomationLogger:
                 logging.getLogger().setLevel(self._logger.level)
 
             if as_global_log:
-                set_global_log(self)
+                set_global_log(self)  # pyright: ignore[reportArgumentType]
 
             # Initialize screenshot manager after log directory is set
             if log_to_file:
@@ -241,12 +241,8 @@ class AutomationLogger:
             print("Writing the error inside log_error.txt")
             file_path = os.path.abspath("log_error.txt")
             with open(file_path, "w+", encoding="utf-8") as file:
-                _ = file.write(
-                    f"Error when instantiating AutomationLogger object: {repr(exc)}\n"
-                )
-                _ = file.write(
-                    "----------------------------------------------------------\n"
-                )
+                _ = file.write(f"Error when instantiating AutomationLogger object: {repr(exc)}\n")
+                _ = file.write("----------------------------------------------------------\n")
                 _ = file.write(error_traceback)
             raise exc
 
@@ -512,9 +508,7 @@ class AutomationLogger:
 
         self._write(str(message), LogLevel.STAT)
 
-    def capture_screenshot(
-        self, filename: str | None = None, optimize_size: bool = False
-    ) -> str:
+    def capture_screenshot(self, filename: str | None = None, optimize_size: bool = False) -> str:
         """
         Captures a screenshot of the entire screen and saves it in the log directory.
 
@@ -539,9 +533,7 @@ class AutomationLogger:
             raise ValueError("Screenshot functionality requires log_to_file=True")
         return self._screenshot_manager.capture_screenshot(filename, optimize_size)
 
-    def capture_screenshot_selenium(
-        self, driver: Any, filename: str | None = None
-    ) -> str:
+    def capture_screenshot_selenium(self, driver: Any, filename: str | None = None) -> str:
         """
         Captures a screenshot of a Selenium driver instance.
 
@@ -585,3 +577,9 @@ class AutomationLogger:
         if self._screenshot_manager is None:
             raise ValueError("File grouping functionality requires log_to_file=True")
         return self._screenshot_manager.group_by_prefix(prefix, sep)
+
+    def insert_profiler(self, name: str, prof: IProfiler):
+        """Insert profiler if not in the dict"""
+
+        if name not in self._profilers:
+            self._profilers[name] = prof
