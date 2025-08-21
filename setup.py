@@ -18,7 +18,7 @@ with open("README.md", "r", encoding="utf-8") as file:
 
 _ = setup(
     name="automation-logging",
-    version="0.1.2",
+    version="0.1.3",
     packages=["automation_logging"],
     url="https://github.com/VBenevides/automation-logging",
     license="MIT",
