@@ -290,6 +290,7 @@ class TestAutomationLogger(unittest.TestCase):
 
         @alog.Profiler("s")
         def func1():
+            alog.info("func1")
             time.sleep(randint(100, 200) / 1000)
 
             i = 0
@@ -298,6 +299,7 @@ class TestAutomationLogger(unittest.TestCase):
 
         @alog.Profiler("s")
         def func2():
+            alog.info("func2")
             i = 0
             for _ in range(int(1e6)):
                 i += 1

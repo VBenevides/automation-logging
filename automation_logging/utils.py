@@ -1,38 +1,33 @@
 import logging
 import inspect
+import os
 from typing import Any
-from gc import collect
-from types import FrameType
+
+
+def _is_automation_logging(frame_path: str) -> bool:
+    frame_module = os.path.basename(os.path.dirname(frame_path))
+    frame_filename = os.path.basename(frame_path)
+    return "automation_logging" in frame_module and "profiler" not in frame_filename
 
 
 def get_frame_info() -> str:
     """Get frame info from the last frame before entering automation_logging modules"""
 
-    nf_alog = False
-    cf_alog = False
     frame = inspect.currentframe()
-    frames: list[tuple[FrameType, str]] = []
+    target_frame = frame
     try:
         while frame:
-            frames.append((frame, inspect.getfile(frame)))
+            if _is_automation_logging(inspect.getfile(frame)):
+                target_frame = frame
             frame = frame.f_back
+        target_frame = target_frame.f_back
         frame_data: dict[str, Any] = {}
-        for i in range(len(frames) - 1, 0, -1):
-            cf = frames[i]
-            nf = frames[i - 1]
-            cf_alog = "automation_logging" in cf[1]
-            nf_alog = "automation_logging" in nf[1]
-            if nf_alog and not cf_alog:
-                frame = cf[0]
-                frame_data["module"] = inspect.getmodulename(inspect.getfile(frame))
-                frame_data["lineno"] = inspect.getlineno(frame)
-                frame_data["function"] = frame.f_code.co_name
-                break
+        frame_data["module"] = inspect.getmodulename(inspect.getfile(target_frame))
+        frame_data["lineno"] = inspect.getlineno(target_frame)
+        frame_data["function"] = target_frame.f_code.co_name
     finally:
         del frame
-        for f, _ in frames:
-            del f
-        _ = collect()
+        del target_frame
 
     if len(frame_data) == 0:
         return "-"
