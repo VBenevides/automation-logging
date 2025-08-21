@@ -1,9 +1,7 @@
 from threading import Lock
 from logging import Logger
-from types import FrameType
 from typing import Any
 import logging
-import inspect
 import os
 import shutil
 import sys
@@ -16,7 +14,7 @@ import weakref
 from enum import IntEnum
 from datetime import datetime, timedelta
 
-from .utils import add_logging_level
+from .utils import add_logging_level, get_frame_info
 from .screenshots import ScreenshotManager
 from .global_logger import set_global_log
 from .protocols import IProfiler
@@ -49,6 +47,14 @@ class LogLevel(IntEnum):
             return logging.CRITICAL
         else:
             raise ValueError(f"Unknown LogLevel: {self}")
+
+
+class FrameInfoFilter(logging.Filter):
+    def filter(self, record: logging.LogRecord) -> bool:
+        # Only add if not already set
+        if not hasattr(record, "frame_info"):
+            record.frame_info = get_frame_info()
+        return True
 
 
 class AutomationLogger:
@@ -214,6 +220,7 @@ class AutomationLogger:
                 file_handler = logging.FileHandler(self.log_file, encoding=encoding)
                 file_handler.setLevel(level_threshold.to_logging_level())
                 file_handler.setFormatter(formatter)
+                file_handler.addFilter(FrameInfoFilter())
                 self._logger.addHandler(file_handler)
 
             # print in console
@@ -318,33 +325,6 @@ class AutomationLogger:
         os.makedirs(log_dir, exist_ok=True)
         return log_dir
 
-    def _get_frame_info(self) -> str:
-        """Get frame info from the last frame before entering automation_logging modules"""
-
-        nf_alog = False
-        cf_alog = False
-        frames: list[tuple[FrameType, str]] = []
-        frame = inspect.currentframe()
-        while frame:
-            frames.append((frame, inspect.getfile(frame)))
-            frame = frame.f_back
-        frame_data: dict[str, Any] = {}
-        for i in range(len(frames) - 1, 0, -1):
-            cf = frames[i]
-            nf = frames[i - 1]
-            cf_alog = "automation_logging" in cf[1]
-            nf_alog = "automation_logging" in nf[1]
-            if nf_alog and not cf_alog:
-                frame = cf[0]
-                frame_data["module"] = inspect.getmodulename(inspect.getfile(frame))
-                frame_data["lineno"] = inspect.getlineno(frame)
-                frame_data["function"] = frame.f_code.co_name
-                break
-
-        if len(frame_data) == 0:
-            return "-"
-        return f"{frame_data['module']}.{frame_data['function']}:{frame_data['lineno']}"
-
     def _write(self, message: str, level: LogLevel) -> None:
         """Writes the message to the log file with the given level
         If the level is lower than the threshold, the message is not written
@@ -362,23 +342,21 @@ class AutomationLogger:
         if level < self.threshold:
             return None
 
-        frame_info = self._get_frame_info()
-
         with self._mutex:
             if level == LogLevel.DEBUG:
-                self._logger.debug(message, extra={"frame_info": frame_info})
+                self._logger.debug(message)
             elif level == LogLevel.INFO:
-                self._logger.info(message, extra={"frame_info": frame_info})
+                self._logger.info(message)
             elif level == LogLevel.STAT:
-                self._logger.stat(message, extra={"frame_info": frame_info})  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]
+                self._logger.stat(message)  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]
             elif level == LogLevel.WARNING:
-                self._logger.warning(message, extra={"frame_info": frame_info})
+                self._logger.warning(message)
             elif level == LogLevel.ERROR:
-                self._logger.error(message, extra={"frame_info": frame_info})
+                self._logger.error(message)
             elif level == LogLevel.EXCEPTION:
-                self._logger.exception(message, extra={"frame_info": frame_info})
+                self._logger.exception(message)
             elif level == LogLevel.CRITICAL:
-                self._logger.critical(message, extra={"frame_info": frame_info})
+                self._logger.critical(message)
 
     def debug(self, message: str) -> None:
         """Writes the message to the log file with level DEBUG

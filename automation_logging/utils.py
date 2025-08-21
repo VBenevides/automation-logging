@@ -1,4 +1,42 @@
 import logging
+import inspect
+from typing import Any
+from gc import collect
+from types import FrameType
+
+
+def get_frame_info() -> str:
+    """Get frame info from the last frame before entering automation_logging modules"""
+
+    nf_alog = False
+    cf_alog = False
+    frame = inspect.currentframe()
+    frames: list[tuple[FrameType, str]] = []
+    try:
+        while frame:
+            frames.append((frame, inspect.getfile(frame)))
+            frame = frame.f_back
+        frame_data: dict[str, Any] = {}
+        for i in range(len(frames) - 1, 0, -1):
+            cf = frames[i]
+            nf = frames[i - 1]
+            cf_alog = "automation_logging" in cf[1]
+            nf_alog = "automation_logging" in nf[1]
+            if nf_alog and not cf_alog:
+                frame = cf[0]
+                frame_data["module"] = inspect.getmodulename(inspect.getfile(frame))
+                frame_data["lineno"] = inspect.getlineno(frame)
+                frame_data["function"] = frame.f_code.co_name
+                break
+    finally:
+        del frame
+        for f, _ in frames:
+            del f
+        _ = collect()
+
+    if len(frame_data) == 0:
+        return "-"
+    return f"{frame_data['module']}.{frame_data['function']}:{frame_data['lineno']}"
 
 
 def add_logging_level(levelName: str, levelNum: int, methodName: str | None = None) -> None:

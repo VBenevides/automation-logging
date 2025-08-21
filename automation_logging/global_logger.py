@@ -40,6 +40,8 @@ def set_global_log(logger: IAutomationLogger) -> None:
     """
 
     global global_log
+    if global_log is not None:
+        del global_log
     global_log = logger
 
 
