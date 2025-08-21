@@ -21,10 +21,11 @@ def get_frame_info() -> str:
                 target_frame = frame
             frame = frame.f_back
         target_frame = target_frame.f_back
-        frame_data: dict[str, Any] = {}
-        frame_data["module"] = inspect.getmodulename(inspect.getfile(target_frame))
-        frame_data["lineno"] = inspect.getlineno(target_frame)
-        frame_data["function"] = target_frame.f_code.co_name
+        frame_data: dict[str, Any] = {"module": "_", "function": "_", "lineno": "_"}
+        if target_frame is not None:
+            frame_data["module"] = inspect.getmodulename(inspect.getfile(target_frame))
+            frame_data["lineno"] = inspect.getlineno(target_frame)
+            frame_data["function"] = target_frame.f_code.co_name
     finally:
         del frame
         del target_frame
