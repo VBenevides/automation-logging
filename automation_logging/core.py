@@ -225,11 +225,12 @@ class AutomationLogger:
 
             # print in console
             if log_to_console:
-                log_format = "%(asctime)s | %(name)s | %(levelname)s | %(message)s"
+                log_format = "%(asctime)s | %(name)s | %(levelname)s | %(frame_info)s | %(message)s"
                 formatter = logging.Formatter(log_format, datefmt="%Y-%m-%d %H:%M:%S%z")
                 console_handler = logging.StreamHandler(sys.stdout)
                 console_handler.setLevel(level_threshold.to_logging_level())
                 console_handler.setFormatter(formatter)
+                console_handler.addFilter(FrameInfoFilter())
                 self._logger.addHandler(console_handler)
 
             # Create new log level

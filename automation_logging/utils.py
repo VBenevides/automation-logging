@@ -14,6 +14,9 @@ def get_frame_info() -> str:
     """Get frame info from the last frame before entering automation_logging modules"""
 
     frame = inspect.currentframe()
+    if frame is None:
+        return "-"
+        
     target_frame = frame
     try:
         while frame:
