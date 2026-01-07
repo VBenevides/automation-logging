@@ -7,6 +7,7 @@ import time
 import warnings
 import logging
 from random import randrange
+import json
 
 import automation_logging as alog
 
@@ -319,6 +320,39 @@ class TestAutomationLogger(unittest.TestCase):
         )
         assert f"Times called: {num_call_1}" in msg, "Incorrect number of function calls for func1"
         assert f"Times called: {num_call_2}" in msg, "Incorrect number of function calls for func2"
+
+    def test_json_logging(self):
+        print(f"Running test: {self.__class__.__name__}.{self._testMethodName}")
+
+        log = alog.AutomationLogger(
+            script_path=__file__,
+            log_dir=self.log_dir,
+            log_to_console=True,
+            log_to_file=True,
+            as_global_log=True,
+            json_formatter=True,
+        )
+
+        test_metadata = {"user_id": 12345, "action": "test_json", "success": True}
+        alog.stat(test_metadata)
+        alog.info("Standard string message")
+
+        with open(log.log_file, "r", encoding="utf-8") as file:
+            lines = file.readlines()
+
+            # 1. Verify we have valid JSON lines
+            stat_entry = json.loads(lines[-2])  # The stat call
+            info_entry = json.loads(lines[-1])  # The info call
+
+            # 2. Verify Stat Merging
+            self.assertEqual(stat_entry["user_id"], 12345)
+            self.assertEqual(stat_entry["success"], True)
+            self.assertEqual(stat_entry["message"], "structured_data")
+
+            # 3. Verify Standard Info
+            self.assertEqual(info_entry["message"], "Standard string message")
+            self.assertIn("timestamp", info_entry)
+            self.assertIn("frame_info", info_entry)
 
 
 if __name__ == "__main__":

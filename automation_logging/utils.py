@@ -16,7 +16,7 @@ def get_frame_info() -> str:
     frame = inspect.currentframe()
     if frame is None:
         return "-"
-        
+
     target_frame = frame
     try:
         while frame:

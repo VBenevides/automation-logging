@@ -5,15 +5,14 @@ import logging
 import os
 import shutil
 import sys
-import getpass
 import traceback
 import time
-import platform
 import atexit
 import weakref
 from enum import IntEnum
 from datetime import datetime, timedelta
 
+from .formatters import DefaultFormatter, JsonFormatter
 from .utils import add_logging_level, get_frame_info
 from .screenshots import ScreenshotManager
 from .global_logger import set_global_log
@@ -88,6 +87,7 @@ class AutomationLogger:
         as_logging_root: bool = False,
         as_global_log: bool = True,
         level_threshold: LogLevel = LogLevel.INFO,
+        json_formatter: bool = False,
     ) -> None:
         """
         Initializes a AutomationLogger object for standardized logging in a script or robot.
@@ -133,6 +133,10 @@ class AutomationLogger:
         level_threshold: LogLevel
             Lowest log level that will be logged, Any level less severe than the current one will be ignored.
             The order from least severe to most severe: debug, info, state, warning, error, exception, critical
+
+        json_formatter: bool, optional
+            Flag that controls if messages will be logged as simple text or as json, this could be useful for
+            integrating with solutions that expect a single record per log message.
 
         Returns
         -------
@@ -197,13 +201,6 @@ class AutomationLogger:
             else:
                 self.log_file = ""
 
-            # Getting system and user information to include in the log
-            system_name = platform.node()
-            user_domain = os.environ.get("USERDOMAIN", "-")
-            if user_domain == "-":
-                complete_user = getpass.getuser()
-            else:
-                complete_user = f"{user_domain}\\{getpass.getuser()}"
             # Configuring the logger object
             self._logger: Logger = logging.getLogger(name=script_name)
             self._logger.setLevel(level_threshold.to_logging_level())
@@ -212,25 +209,24 @@ class AutomationLogger:
 
             # log to file
             if log_to_file:
-                log_format = (
-                    f"%(asctime)s | {system_name} | {complete_user} | %(name)s"
-                    " | %(levelname)s | %(frame_info)s | %(message)s"
-                )
-                formatter = logging.Formatter(log_format, datefmt="%Y-%m-%d %H:%M:%S%z")
                 file_handler = logging.FileHandler(self.log_file, encoding=encoding)
                 file_handler.setLevel(level_threshold.to_logging_level())
-                file_handler.setFormatter(formatter)
                 file_handler.addFilter(FrameInfoFilter())
+                if json_formatter:
+                    file_handler.setFormatter(JsonFormatter())
+                else:
+                    file_handler.setFormatter(DefaultFormatter())
                 self._logger.addHandler(file_handler)
 
             # print in console
             if log_to_console:
-                log_format = "%(asctime)s | %(name)s | %(levelname)s | %(frame_info)s | %(message)s"
-                formatter = logging.Formatter(log_format, datefmt="%Y-%m-%d %H:%M:%S%z")
                 console_handler = logging.StreamHandler(sys.stdout)
                 console_handler.setLevel(level_threshold.to_logging_level())
-                console_handler.setFormatter(formatter)
                 console_handler.addFilter(FrameInfoFilter())
+                if json_formatter:
+                    console_handler.setFormatter(JsonFormatter())
+                else:
+                    console_handler.setFormatter(DefaultFormatter())
                 self._logger.addHandler(console_handler)
 
             # Create new log level
@@ -522,7 +518,7 @@ class AutomationLogger:
         >>> log.stat(info_dict)
         """
 
-        self._write(str(message), LogLevel.STAT)
+        self._write(message, LogLevel.STAT)
 
     def capture_screenshot(self, filename: str | None = None, optimize_size: bool = False) -> str:
         """
